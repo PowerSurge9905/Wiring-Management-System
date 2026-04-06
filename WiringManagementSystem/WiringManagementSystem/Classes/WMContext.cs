@@ -11,11 +11,11 @@ namespace WiringManagementSystem.Classes
     {
         public DbSet<Rack> Racks { get; set; }
         public DbSet<Device> Devices { get; set; }
-    }
+    
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Add seed date later
+            // Add seed data later
         }
     }
 }
