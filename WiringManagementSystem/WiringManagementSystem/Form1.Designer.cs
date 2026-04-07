@@ -44,6 +44,7 @@
             tree_WiringManagement.Name = "tree_WiringManagement";
             tree_WiringManagement.Size = new Size(513, 198);
             tree_WiringManagement.TabIndex = 0;
+            tree_WiringManagement.MouseDown += treeView_MouseDown;
             // 
             // listBox1
             // 
