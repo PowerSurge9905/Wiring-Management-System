@@ -14,6 +14,8 @@ namespace WiringManagementSystem.Classes
         public required string DeviceName { get; set; }
         public required DeviceType Type { get; set; }
         public string? RackID { get; set; }
+
+        public string? PodID { get; set; } // Optional property to associate a device with a pod
         public Dictionary</*PortID*/string, /*ConnectedPortID*/string?>? Ports { get; set; }
         // Figure out how to implement outlets, maybe they inherit Port?
         public Dictionary<string, string?>? Outlets { get; set; }

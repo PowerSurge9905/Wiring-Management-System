@@ -1,3 +1,4 @@
+using WiringManagementSystem.Classes;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace WiringManagementSystem
@@ -8,6 +9,7 @@ namespace WiringManagementSystem
         {
             InitializeComponent();
         }
+
         //Handle mouse down event on the tree view to clear selection when clicking outside of any node
         private void treeView_MouseDown(object sender, MouseEventArgs e)
         {
