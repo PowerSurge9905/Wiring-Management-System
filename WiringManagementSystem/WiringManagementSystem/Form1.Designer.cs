@@ -30,7 +30,7 @@
         {
             tree_WiringManagement = new TreeView();
             sqlDataAdapter1 = new Microsoft.Data.SqlClient.SqlDataAdapter();
-            listBox1 = new ListBox();
+            lst_Description = new ListBox();
             btnAddDevice = new Button();
             btnEditDevice = new Button();
             btnEditConnection = new Button();
@@ -46,14 +46,14 @@
             tree_WiringManagement.TabIndex = 0;
             tree_WiringManagement.MouseDown += treeView_MouseDown;
             // 
-            // listBox1
+            // lst_Description
             // 
-            listBox1.FormattingEnabled = true;
-            listBox1.ItemHeight = 15;
-            listBox1.Location = new Point(12, 216);
-            listBox1.Name = "listBox1";
-            listBox1.Size = new Size(513, 94);
-            listBox1.TabIndex = 1;
+            lst_Description.FormattingEnabled = true;
+            lst_Description.ItemHeight = 15;
+            lst_Description.Location = new Point(12, 216);
+            lst_Description.Name = "lst_Description";
+            lst_Description.Size = new Size(513, 94);
+            lst_Description.TabIndex = 1;
             // 
             // btnAddDevice
             // 
@@ -112,7 +112,7 @@
             Controls.Add(btnEditConnection);
             Controls.Add(btnEditDevice);
             Controls.Add(btnAddDevice);
-            Controls.Add(listBox1);
+            Controls.Add(lst_Description);
             Controls.Add(tree_WiringManagement);
             Name = "WMForm";
             Text = "Wiring Management System";
@@ -124,7 +124,7 @@
 
         private TreeView tree_WiringManagement;
         private Microsoft.Data.SqlClient.SqlDataAdapter sqlDataAdapter1;
-        private ListBox listBox1;
+        private ListBox lst_Description;
         private Button btnAddDevice;
         private Button btnEditDevice;
         private Button btnEditConnection;

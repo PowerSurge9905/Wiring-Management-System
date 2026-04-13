@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using WiringManagementSystem.Classes;
 using Microsoft.Data.Sqlite;
+using Microsoft.IdentityModel.Tokens;
 
 namespace WiringManagementSystem
 {
@@ -26,6 +27,36 @@ namespace WiringManagementSystem
             this.dbContext.Racks.Load();
 
             this.dbContext.Devices.Load();
+
+            // Queries all racks
+            var racks = this.dbContext.Racks.Select(r => new
+            {
+                r.RackID,
+                r.RackName
+            }).ToList();
+
+            // Queries all devices
+            var devices = this.dbContext.Devices.Select(d => new
+            {
+                d.DeviceID,
+                d.DeviceName,
+                d.Type,
+                d.RackID,
+                d.PodID
+            }).ToList();
+
+            foreach (var rack in racks)
+            {
+                tree_WiringManagement.Nodes.Add(rack.RackName);
+                tree_WiringManagement.Nodes[tree_WiringManagement.Nodes.Count - 1].Tag = rack.RackID;
+                var selectDevices = devices.Where(d => d.RackID == rack.RackID).Where(d => string.IsNullOrEmpty(d.PodID)).ToList();
+                foreach (var device in selectDevices)
+                {
+                    var currentNode = tree_WiringManagement.Nodes[tree_WiringManagement.Nodes.Count - 1];
+                    currentNode.Nodes.Add(device.DeviceName);
+                    currentNode.Nodes[currentNode.Nodes.Count - 1].Tag = new[] { device.DeviceID, device.Type.ToString(), device.RackID, device.PodID };
+                }
+            }
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -41,6 +72,20 @@ namespace WiringManagementSystem
         {
             //Get the node at the current mouse pointer coordinates
             TreeNode clickedNode = tree_WiringManagement.GetNodeAt(e.X, e.Y);
+
+            lst_Description.Items.Clear();
+            if (clickedNode != null)
+            {
+                lst_Description.Items.Add($"Name: {clickedNode.Text}");
+                var tag = clickedNode.Tag as object[];
+                if (tag != null)
+                {
+                    lst_Description.Items.Add($"Type: {tag[1]}");
+                    lst_Description.Items.Add($"Rack: {clickedNode.Parent.Text}");
+                    if (!string.IsNullOrEmpty(tag[3]?.ToString()))
+                        lst_Description.Items.Add($"PodID: {tag[3]}");
+                }
+            }
 
             //If there is no node under the mouse, clear the selection
             if (clickedNode == null)
