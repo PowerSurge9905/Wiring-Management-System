@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using WiringManagementSystem.Classes;
 using Microsoft.Data.Sqlite;
+using Microsoft.IdentityModel.Tokens;
 
 namespace WiringManagementSystem
 {
@@ -26,6 +27,32 @@ namespace WiringManagementSystem
             this.dbContext.Racks.Load();
 
             this.dbContext.Devices.Load();
+
+            var racks = this.dbContext.Racks.Select(r => new
+            {
+                r.RackID,
+                r.RackName
+            }).ToList();
+
+            var devices = this.dbContext.Devices.Select(d => new
+            {
+                d.DeviceID,
+                d.DeviceName,
+                d.RackID,
+                d.PodID
+            }).ToList();
+
+            foreach (var rack in racks)
+            {
+                tree_WiringManagement.Nodes.Add(rack.RackName);
+                tree_WiringManagement.Nodes[tree_WiringManagement.Nodes.Count - 1].Tag = rack.RackID;
+                var selectDevices = devices.Where(d => d.RackID == rack.RackID).Where(d => string.IsNullOrEmpty(d.PodID)).ToList();
+                foreach (var device in selectDevices)
+                {
+                    tree_WiringManagement.Nodes[tree_WiringManagement.Nodes.Count - 1].Nodes.Add(device.DeviceName);
+                    tree_WiringManagement.Nodes[tree_WiringManagement.Nodes.Count - 1].Nodes[tree_WiringManagement.Nodes[tree_WiringManagement.Nodes.Count - 1].Nodes.Count - 1].Tag = device.DeviceID;
+                }
+            }
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
