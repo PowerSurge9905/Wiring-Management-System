@@ -1,6 +1,6 @@
 ﻿namespace WiringManagementSystem
 {
-    partial class Form1
+    partial class WMForm
     {
         /// <summary>
         ///  Required designer variable.
@@ -102,7 +102,7 @@
             txtBox.Size = new Size(245, 23);
             txtBox.TabIndex = 6;
             // 
-            // Form1
+            // WMForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
@@ -114,8 +114,8 @@
             Controls.Add(btnAddDevice);
             Controls.Add(listBox1);
             Controls.Add(tree_WiringManagement);
-            Name = "Form1";
-            Text = "Form1";
+            Name = "WMForm";
+            Text = "Wiring Management System";
             ResumeLayout(false);
             PerformLayout();
         }

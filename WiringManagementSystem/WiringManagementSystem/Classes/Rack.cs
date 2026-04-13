@@ -15,7 +15,13 @@ namespace WiringManagementSystem.Classes
         public Rack GetRackByID(string rackID)
         {
             // Implementation to retrieve a rack by its ID from the database
-            return new Rack(); // Placeholder return statement
+            return new Rack
+            {
+                RackID = "PlaceholderID",
+                RackName = "PlaceholderName",
+                DevicesID = new List<string>(),
+                Devices = new List<Device>()
+            }; // Placeholder return statement
         }
     }
 }

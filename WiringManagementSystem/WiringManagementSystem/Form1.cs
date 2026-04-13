@@ -1,13 +1,39 @@
+using Microsoft.EntityFrameworkCore;
 using WiringManagementSystem.Classes;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using Microsoft.Data.Sqlite;
 
 namespace WiringManagementSystem
 {
-    public partial class Form1 : Form
+    public partial class WMForm : Form
     {
-        public Form1()
+        private WMContext? dbContext;
+
+        protected string connectionString = "Data Source=WMDB.sqlite";
+
+        public WMForm()
         {
             InitializeComponent();
+        }
+
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+
+            this.dbContext = new WMContext();
+
+            this.dbContext.Database.EnsureCreated();
+
+            this.dbContext.Racks.Load();
+
+            this.dbContext.Devices.Load();
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            base.OnFormClosing(e);
+
+            this.dbContext?.Dispose();
+            this.dbContext = null;
         }
 
         //Handle mouse down event on the tree view to clear selection when clicking outside of any node

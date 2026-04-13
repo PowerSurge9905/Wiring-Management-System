@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WiringManagementSystem.Classes.Enums
+namespace WiringManagementSystem.Classes
 {
-    internal enum DeviceType
+    public enum DeviceType
     {
         Server,
         Switch,
