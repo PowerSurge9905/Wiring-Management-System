@@ -40,6 +40,7 @@
             // 
             // tree_WiringManagement
             // 
+            tree_WiringManagement.Font = new Font("Courier New", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
             tree_WiringManagement.Location = new Point(12, 12);
             tree_WiringManagement.Name = "tree_WiringManagement";
             tree_WiringManagement.Size = new Size(513, 198);
@@ -48,11 +49,11 @@
             // 
             // lst_Description
             // 
+            lst_Description.Font = new Font("Courier New", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
             lst_Description.FormattingEnabled = true;
-            lst_Description.ItemHeight = 15;
             lst_Description.Location = new Point(12, 216);
             lst_Description.Name = "lst_Description";
-            lst_Description.Size = new Size(513, 94);
+            lst_Description.Size = new Size(513, 84);
             lst_Description.TabIndex = 1;
             // 
             // btnAddDevice

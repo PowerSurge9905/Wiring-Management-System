@@ -93,15 +93,23 @@ namespace WiringManagementSystem
             {
                 lst_Description.Items.Add($"Name: {clickedNode.Text}");
                 var tag = clickedNode.Tag as object[];
+
+                // Check if the clicked node is a root node or a pod, if so show number of devices contained within
+                if (clickedNode.Parent == null || (tag != null && tag[1].ToString() == DeviceType.Pod.ToString()))
+                {
+                    lst_Description.Items.Add($"Number of Devices: {clickedNode.GetNodeCount(true)}");
+                }
+                
                 // Check if the clicked node has a tag, display tag data if so
-                if (tag != null)
+                // Should never be a root node
+                if (tag != null && clickedNode.Parent != null)
                 {
                     lst_Description.Items.Add($"Type: {tag[1]}");
                     // Check if the clicked node is in a pod, show rack and pod details if so, otherwise just show rack details
                     if (!string.IsNullOrEmpty(tag[3]?.ToString()))
                     {
                         lst_Description.Items.Add($"Rack: {clickedNode.Parent.Parent.Text}");
-                        lst_Description.Items.Add($"Pod: {clickedNode.Parent.Text}");
+                        lst_Description.Items.Add($"Pod:  {clickedNode.Parent.Text}");
                     }
                     else
                     {
