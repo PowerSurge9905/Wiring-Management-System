@@ -64,6 +64,7 @@
             btnAdd.TabIndex = 4;
             btnAdd.Text = "&Add";
             btnAdd.UseVisualStyleBackColor = true;
+            btnAdd.Click += btnAdd_Click;
             // 
             // btnCancel
             // 
@@ -73,6 +74,7 @@
             btnCancel.TabIndex = 5;
             btnCancel.Text = "&Cancel";
             btnCancel.UseVisualStyleBackColor = true;
+            btnCancel.Click += btnCancel_Click;
             // 
             // lblEditDeviceType
             // 
@@ -142,7 +144,6 @@
             Controls.Add(lblEditDeviceName);
             Name = "FrmEditDevice";
             Text = "Edit Device";
-            Load += FormEditDevice_Load;
             ResumeLayout(false);
             PerformLayout();
         }
