@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WiringManagementSystem.Classes
 {
-    internal class Rack
+    public class Rack
     {
         public required string RackID { get; set; }
         public required string RackName { get; set; }

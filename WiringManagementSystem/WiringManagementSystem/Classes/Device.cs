@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace WiringManagementSystem.Classes
 {
-    internal class Device
+    public class Device
     {
         public required string DeviceID { get; set; }
         public required string DeviceName { get; set; }

@@ -2,14 +2,16 @@ using Microsoft.EntityFrameworkCore;
 using WiringManagementSystem.Classes;
 using Microsoft.Data.Sqlite;
 using Microsoft.IdentityModel.Tokens;
+using System.Configuration;
+using Microsoft.Identity.Client;
 
 namespace WiringManagementSystem
 {
     public partial class WMForm : Form
     {
-        private WMContext? dbContext;
+        readonly string connectionString = "Data Source=WMDB.sqlite";
 
-        protected string connectionString = "Data Source=WMDB.sqlite";
+        WMContext wmdb = new WMContext();
 
         public WMForm()
         {
@@ -21,61 +23,17 @@ namespace WiringManagementSystem
         {
             base.OnLoad(e);
 
-            this.dbContext = new WMContext();
+            wmdb.Database.EnsureCreated();
 
-            this.dbContext.Database.EnsureCreated();
+            wmdb.Racks.Load();
 
-            this.dbContext.Racks.Load();
-
-            this.dbContext.Devices.Load();
-
+            wmdb.Devices.Load();
             // Queries all racks
-            var racks = this.dbContext.Racks.Select(r => new
-            {
-                r.RackID,
-                r.RackName
-            }).ToList();
 
-            // Queries all devices
-            var devices = this.dbContext.Devices.Select(d => new
-            {
-                d.DeviceID,
-                d.DeviceName,
-                d.Type,
-                d.RackID,
-                d.PodID
-            }).ToList();
+            var racks = wmdb.Racks.ToList();
+            var devices = wmdb.Devices.ToList();
 
-            foreach (var rack in racks)
-            {
-                // Add each rack as root nodes
-                tree_WiringManagement.Nodes.Add(rack.RackName);
-                // Give each rack node tag data
-                tree_WiringManagement.Nodes[tree_WiringManagement.Nodes.Count - 1].Tag = rack.RackID;
-
-                // Select devices in the current rack, but not in a pod
-                var selectDevices = devices.Where(d => d.RackID == rack.RackID).Where(d => string.IsNullOrEmpty(d.PodID)).ToList();
-                foreach (var device in selectDevices)
-                {
-                    // Add devices in a rack, but not in a pod as child nodes of the rack
-                    var currentNode = tree_WiringManagement.Nodes[tree_WiringManagement.Nodes.Count - 1];
-                    currentNode.Nodes.Add(device.DeviceName);
-                    currentNode.Nodes[currentNode.Nodes.Count - 1].Tag = new[] { device.DeviceID, device.Type.ToString(), device.RackID, device.PodID };
-
-                    if (device.Type == DeviceType.Pod)
-                    {
-                        // If the device is a pod, select devices in the current pod
-                        var selectPodDevices = devices.Where(d => d.PodID == device.DeviceID).ToList();
-                        foreach (var podDevice in selectPodDevices)
-                        {
-                            // Add devices in a pod as child nodes of the pod
-                            var currentPodNode = currentNode.Nodes[currentNode.Nodes.Count - 1];
-                            currentPodNode.Nodes.Add(podDevice.DeviceName);
-                            currentPodNode.Nodes[currentPodNode.Nodes.Count - 1].Tag = new[] { podDevice.DeviceID, podDevice.Type.ToString(), podDevice.RackID, podDevice.PodID };
-                        }
-                    }
-                }
-            }
+            BuildTreeView(racks, devices);
         }
 
         // Probably unnecessary, but disposes of database context on form closing
@@ -83,8 +41,44 @@ namespace WiringManagementSystem
         {
             base.OnFormClosing(e);
 
-            this.dbContext?.Dispose();
-            this.dbContext = null;
+            wmdb?.Dispose();
+            wmdb = null;
+        }
+
+        // Builds the tree view based on the supplied lists of racks and devices
+        public void BuildTreeView(List<Rack> racks, List<Device> devices)
+        {
+            // Clear existing nodes before rebuilding the tree view
+            tree_WiringManagement.Nodes.Clear();
+            // Loop through each rack and add it as a root node
+            foreach (var rack in racks)
+            {
+                TreeNode rackNode = new TreeNode(rack.RackName);
+                rackNode.Tag = rack.RackID;
+                tree_WiringManagement.Nodes.Add(rackNode);
+
+                // Query devices that are in the current rack and not in a pod
+                var rackDevices = devices.Where(d => d.RackID == rack.RackID && string.IsNullOrEmpty(d.PodID)).ToList();
+                // Loop through each device in the rack and add it as a child node under the rack node
+                foreach (var device in rackDevices)
+                {
+                    TreeNode deviceNode = new TreeNode(device.DeviceName);
+                    deviceNode.Tag = new[] { device.DeviceID, device.Type.ToString(), device.RackID, device.PodID };
+                    rackNode.Nodes.Add(deviceNode);
+
+                    // If the device is a pod, query for devices that are in that pod and add them as child nodes under the pod node
+                    if (device.Type == DeviceType.Pod)
+                    {
+                        var podDevices = devices.Where(d => d.PodID == device.DeviceID).ToList();
+                        foreach (var podDevice in podDevices)
+                        {
+                            TreeNode podDeviceNode = new TreeNode(podDevice.DeviceName);
+                            podDeviceNode.Tag = new[] { podDevice.DeviceID, podDevice.Type.ToString(), podDevice.RackID, podDevice.PodID };
+                            deviceNode.Nodes.Add(podDeviceNode);
+                        }
+                    }
+                }
+            }
         }
 
         //Handle mouse down event on the tree view to clear selection when clicking outside of any node
@@ -162,6 +156,7 @@ namespace WiringManagementSystem
         }
 
         // Delete the selected node and all of its children
+        // TODO: Change this to open a confirmation dialog before deleting, then delete the corresponding entry in the database as well
         private void btnDeleteDevice_Click(object sender, EventArgs e)
         {
             tree_WiringManagement.Nodes.Remove(tree_WiringManagement.SelectedNode);
