@@ -28,8 +28,8 @@ namespace WiringManagementSystem
             wmdb.Racks.Load();
 
             wmdb.Devices.Load();
-            // Queries all racks
 
+            // Queries all racks & devices
             var racks = wmdb.Racks.ToList();
             var devices = wmdb.Devices.ToList();
 
@@ -167,7 +167,37 @@ namespace WiringManagementSystem
         // TODO: Change this to open a confirmation dialog before deleting, then delete the corresponding entry in the database as well
         private void btnDeleteDevice_Click(object sender, EventArgs e)
         {
-            tree_WiringManagement.Nodes.Remove(tree_WiringManagement.SelectedNode);
+            DialogResult result = DialogResult.None;
+
+            var selectedNode = tree_WiringManagement.SelectedNode;
+
+            if (tree_WiringManagement.SelectedNode == null)
+            {
+                MessageBox.Show("Please select a node to delete.");
+                return;
+            }
+
+            if (selectedNode.GetNodeCount(true) > 0)
+            {
+                result = confirmDeletion(result, true);
+            } else
+            {
+                result = confirmDeletion(result, false);
+            }
+
+            if (result == DialogResult.Yes)
+            {
+                // Delete selected node & all child nodes
+
+                tree_WiringManagement.Nodes.Remove(tree_WiringManagement.SelectedNode);
+            }
+        }
+
+        private DialogResult confirmDeletion(DialogResult result, bool showChildNodes)
+        {
+            return MessageBox.Show(
+                $"Are you sure you want to delete {tree_WiringManagement.SelectedNode.Text}?" + (showChildNodes ? $"\nThis will also delete {tree_WiringManagement.SelectedNode.GetNodeCount(true)} child devices!" : ""),
+                "Confirm Deletion", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
         }
     }
 }
