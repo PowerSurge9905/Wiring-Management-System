@@ -143,6 +143,7 @@
             Controls.Add(txtEditDeviceName);
             Controls.Add(lblEditDeviceName);
             Name = "FrmEditDevice";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "Edit Device";
             ResumeLayout(false);
             PerformLayout();

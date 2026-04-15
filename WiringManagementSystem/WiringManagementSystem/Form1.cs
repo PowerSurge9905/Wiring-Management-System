@@ -129,31 +129,51 @@ namespace WiringManagementSystem
         // TODO: Change this to open a new window which allows the user to input details for a new node
         private void btnAddDevice_Click(object sender, EventArgs e)
         {
-            TreeNode node = new TreeNode(txtBox.Text);
-            try
-            {
-                if (tree_WiringManagement.SelectedNode != null)
-                {
-                    tree_WiringManagement.SelectedNode.Nodes.Add(node);
-                    tree_WiringManagement.SelectedNode.Expand();
-                }
-                else
-                {
-                    tree_WiringManagement.Nodes.Add(node);
-                }
+            //------Temporary comment until new form is implemented correctly------//
 
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error adding node: " + ex.Message);
-            }
+            //TreeNode node = new TreeNode(txtBox.Text);
+            //try
+            //{
+            //    if (tree_WiringManagement.SelectedNode != null)
+            //    {
+            //        tree_WiringManagement.SelectedNode.Nodes.Add(node);
+            //        tree_WiringManagement.SelectedNode.Expand();
+            //    }
+            //    else
+            //    {
+            //        tree_WiringManagement.Nodes.Add(node);
+            //    }
+
+            //}
+            //catch (Exception ex)
+            //{
+            //    MessageBox.Show("Error adding node: " + ex.Message);
+            //}
+
+
+            //Create an instance of the form
+            FrmAddDevice addDeviceForm = new FrmAddDevice();
+
+            //Show the form
+            addDeviceForm.ShowDialog();
+
         }
 
         // Edits the selected node's text to match what's in text box
         // TODO: Change this to open a new window which allows the user to edit details for a new node
         private void btnEditDevice_Click(object sender, EventArgs e)
         {
-            tree_WiringManagement.SelectedNode.Text = txtBox.Text;
+
+            //------Temporary comment until new form is implemented correctly------//
+
+            //tree_WiringManagement.SelectedNode.Text = txtBox.Text;
+
+
+            //Create an instance of the form
+            FrmEditDevice editDeviceForm = new FrmEditDevice();
+
+            //Show the form
+            editDeviceForm.ShowDialog();
         }
 
         // Edits the selected node's text to match what's in text box
