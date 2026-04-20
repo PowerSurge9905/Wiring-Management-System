@@ -36,6 +36,7 @@
             btnEditConnection = new Button();
             btnDeleteDevice = new Button();
             txtBox = new TextBox();
+            lblNotes = new Label();
             SuspendLayout();
             // 
             // tree_WiringManagement
@@ -58,7 +59,7 @@
             // 
             // btnAddDevice
             // 
-            btnAddDevice.Location = new Point(12, 355);
+            btnAddDevice.Location = new Point(12, 429);
             btnAddDevice.Name = "btnAddDevice";
             btnAddDevice.Size = new Size(110, 23);
             btnAddDevice.TabIndex = 2;
@@ -68,7 +69,7 @@
             // 
             // btnEditDevice
             // 
-            btnEditDevice.Location = new Point(147, 355);
+            btnEditDevice.Location = new Point(147, 429);
             btnEditDevice.Name = "btnEditDevice";
             btnEditDevice.Size = new Size(110, 23);
             btnEditDevice.TabIndex = 3;
@@ -78,7 +79,7 @@
             // 
             // btnEditConnection
             // 
-            btnEditConnection.Location = new Point(282, 355);
+            btnEditConnection.Location = new Point(282, 429);
             btnEditConnection.Name = "btnEditConnection";
             btnEditConnection.Size = new Size(110, 23);
             btnEditConnection.TabIndex = 4;
@@ -88,7 +89,7 @@
             // 
             // btnDeleteDevice
             // 
-            btnDeleteDevice.Location = new Point(415, 355);
+            btnDeleteDevice.Location = new Point(415, 429);
             btnDeleteDevice.Name = "btnDeleteDevice";
             btnDeleteDevice.Size = new Size(110, 23);
             btnDeleteDevice.TabIndex = 5;
@@ -98,16 +99,27 @@
             // 
             // txtBox
             // 
-            txtBox.Location = new Point(12, 316);
+            txtBox.Location = new Point(12, 321);
+            txtBox.Multiline = true;
             txtBox.Name = "txtBox";
-            txtBox.Size = new Size(245, 23);
+            txtBox.Size = new Size(513, 102);
             txtBox.TabIndex = 6;
+            // 
+            // lblNotes
+            // 
+            lblNotes.AutoSize = true;
+            lblNotes.Location = new Point(12, 303);
+            lblNotes.Name = "lblNotes";
+            lblNotes.Size = new Size(41, 15);
+            lblNotes.TabIndex = 7;
+            lblNotes.Text = "Notes:";
             // 
             // WMForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(537, 402);
+            ClientSize = new Size(537, 468);
+            Controls.Add(lblNotes);
             Controls.Add(txtBox);
             Controls.Add(btnDeleteDevice);
             Controls.Add(btnEditConnection);
@@ -131,5 +143,6 @@
         private Button btnEditConnection;
         private Button btnDeleteDevice;
         private TextBox txtBox;
+        private Label lblNotes;
     }
 }

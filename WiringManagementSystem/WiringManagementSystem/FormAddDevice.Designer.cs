@@ -116,6 +116,7 @@
             txtAddRack.Name = "txtAddRack";
             txtAddRack.Size = new Size(153, 23);
             txtAddRack.TabIndex = 0;
+            txtAddRack.TextChanged += txtAddRack_TextChanged;
             // 
             // comboBoxAddDeviceType
             // 

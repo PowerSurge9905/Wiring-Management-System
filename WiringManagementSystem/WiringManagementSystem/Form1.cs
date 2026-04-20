@@ -100,7 +100,7 @@ namespace WiringManagementSystem
                 {
                     lst_Description.Items.Add($"Number of Devices: {clickedNode.GetNodeCount(true)}");
                 }
-                
+
                 // Check if the clicked node has a tag, display tag data if so
                 // Should never be a root node
                 if (tag != null && clickedNode.Parent != null)
@@ -127,26 +127,82 @@ namespace WiringManagementSystem
         }
 
         // Add a new node to the tree view, either as a child of the selected node or as a new root node if no node is selected
-        // TODO: Change this to open a new window which allows the user to input details for a new node
+        // NOTE: Must use the correct ID for RackID: ex."RK01" and PodID: ex."PODA" for the TreeView to recongize where to insert node.
         private void btnAddDevice_Click(object sender, EventArgs e)
         {
-            TreeNode node = new TreeNode(txtBox.Text);
-            try
+            // Open the form
+            FrmAddDevice addDeviceForm = new FrmAddDevice();
+
+            // Wait for the user to hit "Add"
+            if (addDeviceForm.ShowDialog() == DialogResult.OK)
             {
-                if (tree_WiringManagement.SelectedNode != null)
+                // Grab the new device data
+                Device newDevice = addDeviceForm.CreatedDevice;
+
+                // Save to database immediately
+                try
                 {
-                    tree_WiringManagement.SelectedNode.Nodes.Add(node);
-                    tree_WiringManagement.SelectedNode.Expand();
+                    wmdb.Devices.Add(newDevice);
+                    wmdb.SaveChanges();
                 }
-                else
+                catch (Exception ex)
                 {
-                    tree_WiringManagement.Nodes.Add(node);
+                    MessageBox.Show("Error saving to database: " + ex.Message);
+                    return; // Stop running if the database fails
                 }
 
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error adding node: " + ex.Message);
+                // Create the node with DeviceName and Tag array
+                TreeNode node = new TreeNode(newDevice.DeviceName);
+                node.Tag = new[] { newDevice.DeviceID, newDevice.Type.ToString(), newDevice.RackID, newDevice.PodID };
+
+                // Find the correct Rack and Pod
+                TreeNode targetParent = null;
+
+                // Search through all Root Nodes (Racks)
+                foreach (TreeNode rackNode in tree_WiringManagement.Nodes)
+                {
+                    
+                    if (rackNode.Tag != null && rackNode.Tag.ToString() == newDevice.RackID)
+                    {
+                        targetParent = rackNode; // Target parent becomes the Rack node by default
+
+                        // If the user also typed in a PodID, we need to search inside this Rack
+                        if (!string.IsNullOrEmpty(newDevice.PodID))
+                        {
+                            foreach (TreeNode podNode in rackNode.Nodes)
+                            {
+                                var tagData = podNode.Tag as object[];
+                                // tagData[0] is the DeviceID. We check if it matches the PodID they entered
+                                if (tagData != null && tagData.Length > 0 && tagData[0].ToString() == newDevice.PodID)
+                                {
+                                    targetParent = podNode; // Target parent becomes the Pod node instead of the Rack node
+                                    break; // Stop searching pods
+                                }
+                            }
+                        }
+                        break; // Stop searching racks
+                    }
+                }
+
+                // Insert the node exactly where it belongs
+                try
+                {
+                    if (targetParent != null)
+                    {
+                        // Find the Rack or Pod and insert the new node as a child of that Rack or Pod
+                        targetParent.Nodes.Add(node);
+                        targetParent.Expand();
+                    }
+                    else
+                    {
+                        // Fallback: If they typed a Rack that doesn't exist, just add it to the main tree
+                        tree_WiringManagement.Nodes.Add(node);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error adding node to form: " + ex.Message);
+                }
             }
         }
 
@@ -154,7 +210,9 @@ namespace WiringManagementSystem
         // TODO: Change this to open a new window which allows the user to edit details for a new node
         private void btnEditDevice_Click(object sender, EventArgs e)
         {
-            tree_WiringManagement.SelectedNode.Text = txtBox.Text;
+            //tree_WiringManagement.SelectedNode.Text = txtBox.Text;
+            FrmEditDevice editDeviceForm = new FrmEditDevice();
+            editDeviceForm.ShowDialog();
         }
 
         // Edits the selected node's text to match what's in text box
@@ -181,7 +239,8 @@ namespace WiringManagementSystem
             if (selectedNode.GetNodeCount(true) > 0)
             {
                 result = confirmDeletion(result, true);
-            } else
+            }
+            else
             {
                 result = confirmDeletion(result, false);
             }
