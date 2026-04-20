@@ -25,6 +25,7 @@ namespace WiringManagementSystem
 
             wmdb.Database.EnsureCreated();
 
+            // NOTE: This loads from the WMDB.SQLite file in bin\Debug\net8.0-windows
             wmdb.Racks.Load();
 
             wmdb.Devices.Load();

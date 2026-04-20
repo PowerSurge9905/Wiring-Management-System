@@ -15,19 +15,6 @@ namespace WiringManagementSystem.Classes
 
         public string? PodID { get; set; } // Optional property to associate a device with a pod
 
-        public Device GetDeviceByID(string deviceID)
-        {
-            // Implementation to retrieve a device by its ID from the database
-            // SEED DATA FIRST, THEN IMPLEMENT THIS METHOD
-            // Fixed: Provide non-null values for required parameters and properties
-            return new Device
-            {
-                DeviceID = "PlaceholderID",
-                DeviceName = "PlaceholderName",
-                Type = DeviceType.Router,
-                RackID = string.Empty,
-                PodID = string.Empty
-            };
-        }
+        public List<string>? Connections { get; set; } // Optional property to store connections to other devices
     }
 }

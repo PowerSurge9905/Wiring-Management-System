@@ -69,7 +69,7 @@ namespace WiringManagementSystem.Classes
                 new Device { DeviceID = PodBID, DeviceName = "Pod B", Type = DeviceType.Pod, RackID = Rack1ID }, // Pod B
                 new Device { DeviceID = PodCID, DeviceName = "Pod C", Type = DeviceType.Pod, RackID = Rack1ID }, // Pod C
                 new Device { DeviceID = PodDID, DeviceName = "Pod D", Type = DeviceType.Pod, RackID = Rack1ID }, // Pod D
-                new Device { DeviceID = "RT00", DeviceName = "Cisco 1900 Series Router - Rack 1", Type = DeviceType.Router, RackID = Rack1ID }, 
+                new Device { DeviceID = "RT00", DeviceName = "Cisco 1900 Series Router - Rack 1", Type = DeviceType.Router, RackID = Rack1ID, Connections = ["test"] }, 
                 new Device { DeviceID = "SW00", DeviceName = "Catalyst 2900 Plus Series Switch - Rack 1", Type = DeviceType.Switch, RackID = Rack1ID },
                 new Device { DeviceID = "FRWA", DeviceName = "ASA 5505 Series Firewall - Bloc A", Type = DeviceType.Firewall, RackID = Rack1ID }, // Pod A firewall
                 new Device { DeviceID = "FRWB", DeviceName = "ASA 5505 Series Firewall - Bloc B", Type = DeviceType.Firewall, RackID = Rack1ID }, // Pod B firewall

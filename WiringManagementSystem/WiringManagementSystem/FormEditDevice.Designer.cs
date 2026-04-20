@@ -62,8 +62,9 @@
             btnAdd.Name = "btnAdd";
             btnAdd.Size = new Size(75, 23);
             btnAdd.TabIndex = 4;
-            btnAdd.Text = "&Add";
+            btnAdd.Text = "&Edit";
             btnAdd.UseVisualStyleBackColor = true;
+            btnAdd.Click += btnAdd_Click;
             // 
             // btnCancel
             // 
