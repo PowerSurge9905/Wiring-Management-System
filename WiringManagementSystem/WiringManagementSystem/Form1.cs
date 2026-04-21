@@ -223,14 +223,12 @@ namespace WiringManagementSystem
         }
 
         // Delete the selected node and all of its children
-        // TODO: Change this to open a confirmation dialog before deleting, then delete the corresponding entry in the database as well
         private void btnDeleteDevice_Click(object sender, EventArgs e)
         {
             DialogResult result = DialogResult.None;
-
             var selectedNode = tree_WiringManagement.SelectedNode;
 
-            if (tree_WiringManagement.SelectedNode == null)
+            if (selectedNode == null)
             {
                 MessageBox.Show("Please select a node to delete.");
                 return;
@@ -247,10 +245,47 @@ namespace WiringManagementSystem
 
             if (result == DialogResult.Yes)
             {
-                // Delete selected node & all child nodes
+                try
+                {
+                    // Delete from DB
+                    // Check if root node is a rack
+                    if(selectedNode.Parent == null)
+                    {
+                        string rackId = selectedNode.Tag.ToString();
+                        var rackToDelete = wmdb.Racks.Find(rackId);
+                        if(rackToDelete != null)
+                        {
+                            wmdb.Racks.Remove(rackToDelete);
+                        }
+                    }
+                    else // If it's not a rack, it's a device/pod
+                    {
+                        var tagArray = selectedNode.Tag as object[];
+                        if (tagArray != null)
+                        {
+                            string deviceId = tagArray[0].ToString(); // tag[0] is the DeviceID
+                            var deviceToDelete = wmdb.Devices.Find(deviceId);
+                            if(deviceToDelete != null)
+                            {
+                                wmdb.Devices.Remove(deviceToDelete);
+                            }
+                        }
+                    }
+                    // Save changes to the DB after deletion
+                    wmdb.SaveChanges();
 
-                tree_WiringManagement.Nodes.Remove(tree_WiringManagement.SelectedNode);
+                    // Remove from TreeView UI
+                    selectedNode.Remove();
+
+                    // Clear the description box
+                    lst_Description.Items.Clear();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error deleting from database: " + ex.Message, "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }   
             }
+            
         }
 
         private DialogResult confirmDeletion(DialogResult result, bool showChildNodes)
