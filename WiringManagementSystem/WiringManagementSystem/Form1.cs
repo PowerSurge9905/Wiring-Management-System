@@ -4,46 +4,88 @@ using Microsoft.Data.Sqlite;
 using Microsoft.IdentityModel.Tokens;
 using System.Configuration;
 using Microsoft.Identity.Client;
+using Microsoft.Extensions.Configuration.EnvironmentVariables;
 
 namespace WiringManagementSystem
 {
     public partial class WMForm : Form
     {
-        readonly string connectionString = "Data Source=WMDB.sqlite";
+        // Forces the application to look in the same directory as this class for the Wiring Management Database (WMDB) file
+        readonly string connectionString = $"Data Source={Path.Combine(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..\\..\\..\\")), "WMDB.sqlite")}";
 
-        WMContext wmdb = new WMContext();
+        // Prepare queries and lists for loading the racks and devices from the database
+        string rackQuery = "SELECT * FROM Racks";
+        string deviceQuery = "SELECT * FROM Devices";
+        List<Rack> racks = new List<Rack>();
+        List<Device> devices = new List<Device>();
 
+        // Constructor for the main form, responsible for initializing the form and loading data from the database
         public WMForm()
         {
             InitializeComponent();
-        }
+            try
+            {
+                // Open a connection to WMDB
+                using var connection = new SqliteConnection(connectionString);
+                connection.Open();
 
-        // Initialize the database context and load data into the tree view when the form loads
-        protected override void OnLoad(EventArgs e)
-        {
-            base.OnLoad(e);
+                // Declare queries to be used on WMDB
+                using var rackCommand = new SqliteCommand(rackQuery, connection);
+                using var deviceCommand = new SqliteCommand(deviceQuery, connection);
 
-            wmdb.Database.EnsureCreated();
+                // Declare readers for executing the queries
+                using var rackReader = rackCommand.ExecuteReader();
+                using var deviceReader = deviceCommand.ExecuteReader();
 
-            // NOTE: This loads from the WMDB.SQLite file in bin\Debug\net8.0-windows
-            wmdb.Racks.Load();
+                // Check if the rack reader has rows, if not show error message, otherwise read through the racks and add them to the racks list
+                if (rackReader == null || !rackReader.HasRows)
+                {
+                    MessageBox.Show("Error loading rack data from database.");
+                }
+                else
+                {
+                    while (rackReader.Read())
+                    {
+                        var rackID = rackReader.GetString(0);
+                        var rackName = rackReader.GetString(1);
+                        racks.Add(new Rack { RackID = rackID, RackName = rackName });
+                    }
+                }
 
-            wmdb.Devices.Load();
-
-            // Queries all racks & devices
-            var racks = wmdb.Racks.ToList();
-            var devices = wmdb.Devices.ToList();
+                // Check if the device reader has rows, if not show error message, otherwise read through the devices and add them to the devices list
+                if (deviceReader == null || !deviceReader.HasRows)
+                {
+                    MessageBox.Show("Error loading device data from database.");
+                }
+                else
+                {
+                    while (deviceReader.Read())
+                    {
+                        var deviceID = deviceReader.GetString(0);
+                        var deviceName = deviceReader.GetString(1);
+                        var type = (DeviceType)deviceReader.GetInt32(2);
+                        var rackID = deviceReader.GetString(3);
+                        var podID = deviceReader.IsDBNull(4) ? null : deviceReader.GetString(4);
+                        /* 
+                         * Important: Notes cannot be stored as a list in the database
+                         * Instead, they are stored as a single string delimited by the Unicode character '•' (U+2022) (Alt Code 0149)
+                         * It was chosen because it is unlikely to be used in any notes, and does not appear on a US QWERTY keyboard
+                         */
+                        var notes = deviceReader.IsDBNull(5) ? null : deviceReader.GetString(5).Split('•').ToList();
+                        devices.Add(new Device { DeviceID = deviceID, DeviceName = deviceName, Type = type, RackID = rackID, PodID = podID, Notes = notes });
+                    }
+                }
+            }
+            catch (SqliteException ex)
+            {
+                MessageBox.Show("Database error: " + ex.Message, "Database Error!");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Exception!");
+            }
 
             BuildTreeView(racks, devices);
-        }
-
-        // Probably unnecessary, but disposes of database context on form closing
-        protected override void OnFormClosing(FormClosingEventArgs e)
-        {
-            base.OnFormClosing(e);
-
-            wmdb?.Dispose();
-            wmdb = null;
         }
 
         // Builds the tree view based on the supplied lists of racks and devices
@@ -100,7 +142,7 @@ namespace WiringManagementSystem
                 {
                     lst_Description.Items.Add($"Number of Devices: {clickedNode.GetNodeCount(true)}");
                 }
-                
+
                 // Check if the clicked node has a tag, display tag data if so
                 // Should never be a root node
                 if (tag != null && clickedNode.Parent != null)
@@ -181,7 +223,8 @@ namespace WiringManagementSystem
             if (selectedNode.GetNodeCount(true) > 0)
             {
                 result = confirmDeletion(result, true);
-            } else
+            }
+            else
             {
                 result = confirmDeletion(result, false);
             }
