@@ -70,6 +70,7 @@ namespace WiringManagementSystem
                          * Important: Notes cannot be stored as a list in the database
                          * Instead, they are stored as a single string delimited by the Unicode character '•' (U+2022) (Alt Code 0149)
                          * It was chosen because it is unlikely to be used in any notes, and does not appear on a US QWERTY keyboard
+                         * The following code splits the notes string back into a list for ease of use
                          */
                         var notes = deviceReader.IsDBNull(5) ? null : deviceReader.GetString(5).Split('•').ToList();
                         devices.Add(new Device { DeviceID = deviceID, DeviceName = deviceName, Type = type, RackID = rackID, PodID = podID, Notes = notes });
