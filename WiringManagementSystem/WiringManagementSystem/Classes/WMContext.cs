@@ -18,6 +18,8 @@ namespace WiringManagementSystem.Classes
         {
         }
 
+        readonly string connectionString = $"Data Source={Path.Combine(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..\\..\\..\\")), "WMDB.sqlite")}";
+
         public DbSet<Rack> Racks { get; set; }
         public DbSet<Device> Devices { get; set; }
 
@@ -48,12 +50,7 @@ namespace WiringManagementSystem.Classes
         {
             if (!optionsBuilder.IsConfigured)
             {
-
-
-                //optionsBuilder.UseSqlite("Data Source=WMDB.sqlite");
-
-                string dbPath = Path.Combine(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..\\..\\..\\")), "WMDB.sqlite");
-                optionsBuilder.UseSqlite($"Data Source={dbPath}");
+                optionsBuilder.UseSqlite($"Data Source={connectionString}");
             }
         }
 

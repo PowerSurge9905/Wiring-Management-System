@@ -82,7 +82,8 @@ namespace WiringManagementSystem
             }
             catch (SqliteException ex)
             {
-                MessageBox.Show("Database error: " + ex.Message, "Database Error!");
+                lst_Description.Items.Add("Database failed to load!");
+                lst_Description.Items.Add("Try restarting the application.");
             }
             catch (Exception ex)
             {
