@@ -48,7 +48,12 @@ namespace WiringManagementSystem.Classes
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlite("Data Source=WMDB.sqlite");
+
+
+                //optionsBuilder.UseSqlite("Data Source=WMDB.sqlite");
+
+                string dbPath = Path.Combine(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..\\..\\..\\")), "WMDB.sqlite");
+                optionsBuilder.UseSqlite($"Data Source={dbPath}");
             }
         }
 

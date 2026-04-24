@@ -20,4 +20,10 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.5" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="WMDB.sqlite">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

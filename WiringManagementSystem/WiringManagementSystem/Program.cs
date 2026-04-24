@@ -16,6 +16,12 @@ namespace WiringManagementSystem
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
+
+            //using (var db = new WMContext())
+            //{
+            //    db.Database.EnsureCreated();
+            //}
+
             Application.Run(new WMForm());
         }
     }
