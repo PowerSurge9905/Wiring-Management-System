@@ -105,6 +105,7 @@
             // 
             // cmbAddDeviceType
             // 
+            cmbAddDeviceType.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbAddDeviceType.FormattingEnabled = true;
             cmbAddDeviceType.Location = new Point(112, 96);
             cmbAddDeviceType.Name = "cmbAddDeviceType";
@@ -113,6 +114,7 @@
             // 
             // cmbAddRack
             // 
+            cmbAddRack.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbAddRack.FormattingEnabled = true;
             cmbAddRack.Location = new Point(112, 25);
             cmbAddRack.Name = "cmbAddRack";
@@ -121,6 +123,7 @@
             // 
             // cmbAddPod
             // 
+            cmbAddPod.DropDownStyle = ComboBoxStyle.DropDownList;
             cmbAddPod.FormattingEnabled = true;
             cmbAddPod.Location = new Point(112, 61);
             cmbAddPod.Name = "cmbAddPod";

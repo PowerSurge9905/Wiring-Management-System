@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace WiringManagementSystem.Classes
 {
@@ -18,7 +13,8 @@ namespace WiringManagementSystem.Classes
         {
         }
 
-        readonly string connectionString = $"Data Source={Path.Combine(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..\\..\\..\\")), "WMDB.sqlite")}";
+        //readonly string connectionString = $"Data Source={Path.Combine(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..\\..\\..\\")), "WMDB.sqlite")}";
+        readonly string connectionString = "Data Source=WMDB.sqlite";
 
         public DbSet<Rack> Racks { get; set; }
         public DbSet<Device> Devices { get; set; }
@@ -50,7 +46,8 @@ namespace WiringManagementSystem.Classes
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlite($"Data Source={connectionString}");
+                //optionsBuilder.UseSqlite($"Data Source={connectionString}");
+                optionsBuilder.UseSqlite("Data Source=WMDB.sqlite");
             }
         }
 

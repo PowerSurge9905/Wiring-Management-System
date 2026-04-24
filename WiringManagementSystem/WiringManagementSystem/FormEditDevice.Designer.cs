@@ -30,14 +30,14 @@
         {
             lblEditDeviceName = new Label();
             txtEditDeviceName = new TextBox();
-            btnAdd = new Button();
+            btnEdit = new Button();
             btnCancel = new Button();
             lblEditDeviceType = new Label();
             lblEditRackNumber = new Label();
             lblEditPod = new Label();
-            txtEditPod = new TextBox();
-            txtEditRack = new TextBox();
-            comboBoxEditDeviceType = new ComboBox();
+            cmbEditDeviceType = new ComboBox();
+            cmbEditRack = new ComboBox();
+            cmbEditPod = new ComboBox();
             SuspendLayout();
             // 
             // lblEditDeviceName
@@ -56,15 +56,15 @@
             txtEditDeviceName.Size = new Size(153, 23);
             txtEditDeviceName.TabIndex = 3;
             // 
-            // btnAdd
+            // btnEdit
             // 
-            btnAdd.Location = new Point(98, 175);
-            btnAdd.Name = "btnAdd";
-            btnAdd.Size = new Size(75, 23);
-            btnAdd.TabIndex = 4;
-            btnAdd.Text = "&Edit";
-            btnAdd.UseVisualStyleBackColor = true;
-            btnAdd.Click += btnAdd_Click;
+            btnEdit.Location = new Point(98, 175);
+            btnEdit.Name = "btnEdit";
+            btnEdit.Size = new Size(75, 23);
+            btnEdit.TabIndex = 4;
+            btnEdit.Text = "&Edit";
+            btnEdit.UseVisualStyleBackColor = true;
+            btnEdit.Click += btnEdit_Click;
             // 
             // btnCancel
             // 
@@ -74,6 +74,7 @@
             btnCancel.TabIndex = 5;
             btnCancel.Text = "&Cancel";
             btnCancel.UseVisualStyleBackColor = true;
+            btnCancel.Click += btnCancel_Click;
             // 
             // lblEditDeviceType
             // 
@@ -102,48 +103,53 @@
             lblEditPod.TabIndex = 7;
             lblEditPod.Text = "Pod:";
             // 
-            // txtEditPod
+            // cmbEditDeviceType
             // 
-            txtEditPod.Location = new Point(111, 57);
-            txtEditPod.Name = "txtEditPod";
-            txtEditPod.Size = new Size(153, 23);
-            txtEditPod.TabIndex = 1;
+            cmbEditDeviceType.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbEditDeviceType.FormattingEnabled = true;
+            cmbEditDeviceType.Location = new Point(111, 97);
+            cmbEditDeviceType.Name = "cmbEditDeviceType";
+            cmbEditDeviceType.Size = new Size(153, 23);
+            cmbEditDeviceType.TabIndex = 2;
             // 
-            // txtEditRack
+            // cmbEditRack
             // 
-            txtEditRack.Location = new Point(111, 21);
-            txtEditRack.Name = "txtEditRack";
-            txtEditRack.Size = new Size(153, 23);
-            txtEditRack.TabIndex = 0;
+            cmbEditRack.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbEditRack.FormattingEnabled = true;
+            cmbEditRack.Location = new Point(111, 29);
+            cmbEditRack.Name = "cmbEditRack";
+            cmbEditRack.Size = new Size(153, 23);
+            cmbEditRack.TabIndex = 10;
             // 
-            // comboBoxEditDeviceType
+            // cmbEditPod
             // 
-            comboBoxEditDeviceType.FormattingEnabled = true;
-            comboBoxEditDeviceType.Location = new Point(111, 97);
-            comboBoxEditDeviceType.Name = "comboBoxEditDeviceType";
-            comboBoxEditDeviceType.Size = new Size(153, 23);
-            comboBoxEditDeviceType.TabIndex = 2;
+            cmbEditPod.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbEditPod.FormattingEnabled = true;
+            cmbEditPod.Location = new Point(111, 62);
+            cmbEditPod.Name = "cmbEditPod";
+            cmbEditPod.Size = new Size(153, 23);
+            cmbEditPod.TabIndex = 11;
             // 
             // FrmEditDevice
             // 
-            AcceptButton = btnAdd;
+            AcceptButton = btnEdit;
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = btnCancel;
             ClientSize = new Size(321, 229);
-            Controls.Add(comboBoxEditDeviceType);
-            Controls.Add(txtEditRack);
-            Controls.Add(txtEditPod);
+            Controls.Add(cmbEditPod);
+            Controls.Add(cmbEditRack);
+            Controls.Add(cmbEditDeviceType);
             Controls.Add(lblEditPod);
             Controls.Add(lblEditRackNumber);
             Controls.Add(lblEditDeviceType);
             Controls.Add(btnCancel);
-            Controls.Add(btnAdd);
+            Controls.Add(btnEdit);
             Controls.Add(txtEditDeviceName);
             Controls.Add(lblEditDeviceName);
             Name = "FrmEditDevice";
             Text = "Edit Device";
-            Load += FormEditDevice_Load;
+            Load += FrmEditDevice_Load;
             ResumeLayout(false);
             PerformLayout();
         }
@@ -152,13 +158,15 @@
 
         private Label lblEditDeviceName;
         private TextBox txtEditDeviceName;
-        private Button btnAdd;
+        private Button btnEdit;
         private Button btnCancel;
         private Label lblEditDeviceType;
         private Label lblEditRackNumber;
         private Label lblEditPod;
         private TextBox txtEditPod;
         private TextBox txtEditRack;
-        private ComboBox comboBoxEditDeviceType;
+        private ComboBox cmbEditDeviceType;
+        private ComboBox cmbEditRack;
+        private ComboBox cmbEditPod;
     }
 }
