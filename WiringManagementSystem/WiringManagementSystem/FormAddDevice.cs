@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows.Forms;
 using WiringManagementSystem.Classes;
 
+
 namespace WiringManagementSystem
 {
     public partial class FrmAddDevice : Form
