@@ -86,12 +86,12 @@ namespace WiringManagementSystem
             BuildTreeView(racks, devices);
         }
 
-        public List<Device> QueryDevices()
-        {
-            var queriedDevices = new List<Device>();
+        //public List<Device> QueryDevices()
+        //{
+        //    var queriedDevices = new List<Device>();
 
 
-        }
+        //}
 
         // Builds the tree view based on the supplied lists of racks and devices
         public void BuildTreeView(List<Rack> racks, List<Device> devices)
@@ -189,8 +189,8 @@ namespace WiringManagementSystem
                 // Save to database immediately
                 try
                 {
-                    wmdb.Devices.Add(newDevice);
-                    wmdb.SaveChanges();
+                    //wmdb.Devices.Add(newDevice);
+                    //wmdb.SaveChanges();
                 }
                 catch (Exception ex)
                 {
@@ -264,9 +264,9 @@ namespace WiringManagementSystem
 
         // Edits the selected node's text to match what's in text box
         // TODO: Change this to open a new window which allows the user to enter notes for connections
-        private void btnEditConnection_Click(object sender, EventArgs e)
+        private void btnEditNotes_Click(object sender, EventArgs e)
         {
-            tree_WiringManagement.SelectedNode.Text = txtBox.Text;
+            tree_WiringManagement.SelectedNode.Text = lstNotes.Text;
         }
 
         // Delete the selected node and all of its children
@@ -296,30 +296,30 @@ namespace WiringManagementSystem
                 {
                     // Delete from DB
                     // Check if root node is a rack
-                    if(selectedNode.Parent == null)
-                    {
-                        string rackId = selectedNode.Tag.ToString();
-                        var rackToDelete = wmdb.Racks.Find(rackId);
-                        if(rackToDelete != null)
-                        {
-                            wmdb.Racks.Remove(rackToDelete);
-                        }
-                    }
-                    else // If it's not a rack, it's a device/pod
-                    {
-                        var tagArray = selectedNode.Tag as object[];
-                        if (tagArray != null)
-                        {
-                            string deviceId = tagArray[0].ToString(); // tag[0] is the DeviceID
-                            var deviceToDelete = wmdb.Devices.Find(deviceId);
-                            if(deviceToDelete != null)
-                            {
-                                wmdb.Devices.Remove(deviceToDelete);
-                            }
-                        }
-                    }
+                    //if(selectedNode.Parent == null)
+                    //{
+                    //    string rackId = selectedNode.Tag.ToString();
+                    //    var rackToDelete = wmdb.Racks.Find(rackId);
+                    //    if (rackToDelete != null)
+                    //    {
+                    //        wmdb.Racks.Remove(rackToDelete);
+                    //    }
+                    //}
+                    //else // If it's not a rack, it's a device/pod
+                    //{
+                    //    var tagArray = selectedNode.Tag as object[];
+                    //    if (tagArray != null)
+                    //    {
+                    //        string deviceId = tagArray[0].ToString(); // tag[0] is the DeviceID
+                    //        var deviceToDelete = wmdb.Devices.Find(deviceId);
+                    //        if(deviceToDelete != null)
+                    //        {
+                    //            wmdb.Devices.Remove(deviceToDelete);
+                    //        }
+                    //    }
+                    //}
                     // Save changes to the DB after deletion
-                    wmdb.SaveChanges();
+                    //wmdb.SaveChanges();
 
                     // Remove from TreeView UI
                     selectedNode.Remove();

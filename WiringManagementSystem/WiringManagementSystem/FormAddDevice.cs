@@ -20,10 +20,9 @@ namespace WiringManagementSystem
         {
             InitializeComponent();
 
-            comboBoxAddDeviceType.DataSource = Enum.GetValues(typeof(Classes.DeviceType));
+            comboBoxAddDeviceType.DataSource = Enum.GetValues(typeof(DeviceType));
+            comboBoxAddDeviceType.SelectedItem =  DeviceType.Server;
         }
-
-
 
         private void btnAdd_Click(object sender, EventArgs e)
         {
@@ -34,9 +33,20 @@ namespace WiringManagementSystem
                 return;
             }
 
+            // Just incase the combobox gets set to an incorrect value
+            if (comboBoxAddDeviceType.SelectedItem == null)
+            {
+                MessageBox.Show("Please select a device type.", "Missing Information", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            
+            // Check if rack here
+
             using (var connection = new SqliteConnection(Globals.connectionString))
             {
-
+                connection.Open();
+                var command = connection.CreateCommand();
+                    command.CommandText = "INSERT INTO";
             }
 
                 // Build new device based on form inputs

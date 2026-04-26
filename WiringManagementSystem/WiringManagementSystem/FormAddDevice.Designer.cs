@@ -120,6 +120,7 @@
             // 
             // comboBoxAddDeviceType
             // 
+            comboBoxAddDeviceType.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBoxAddDeviceType.FormattingEnabled = true;
             comboBoxAddDeviceType.Location = new Point(112, 96);
             comboBoxAddDeviceType.Name = "comboBoxAddDeviceType";
