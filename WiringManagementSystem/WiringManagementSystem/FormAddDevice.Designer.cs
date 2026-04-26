@@ -144,6 +144,7 @@
             Controls.Add(txtAddDeviceName);
             Controls.Add(lblAddDeviceName);
             Name = "FrmAddDevice";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "Add Device";
             ResumeLayout(false);
             PerformLayout();

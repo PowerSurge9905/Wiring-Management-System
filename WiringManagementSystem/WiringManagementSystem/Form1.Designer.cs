@@ -33,7 +33,7 @@
             lst_Description = new ListBox();
             btnAddDevice = new Button();
             btnEditDevice = new Button();
-            btnEditConnection = new Button();
+            btnAddNotes = new Button();
             btnDeleteDevice = new Button();
             txtBox = new TextBox();
             lblNotes = new Label();
@@ -77,7 +77,7 @@
             btnEditDevice.UseVisualStyleBackColor = true;
             btnEditDevice.Click += btnEditDevice_Click;
             // 
-            // btnEditConnection
+            // btnAddNotes
             // 
             btnEditConnection.Location = new Point(282, 429);
             btnEditConnection.Name = "btnEditConnection";
@@ -122,12 +122,14 @@
             Controls.Add(lblNotes);
             Controls.Add(txtBox);
             Controls.Add(btnDeleteDevice);
-            Controls.Add(btnEditConnection);
+            Controls.Add(btnAddNotes);
             Controls.Add(btnEditDevice);
             Controls.Add(btnAddDevice);
             Controls.Add(lst_Description);
             Controls.Add(tree_WiringManagement);
+            KeyPreview = true;
             Name = "WMForm";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "Wiring Management System";
             ResumeLayout(false);
             PerformLayout();
@@ -140,7 +142,7 @@
         private ListBox lst_Description;
         private Button btnAddDevice;
         private Button btnEditDevice;
-        private Button btnEditConnection;
+        private Button btnAddNotes;
         private Button btnDeleteDevice;
         private TextBox txtBox;
         private Label lblNotes;
