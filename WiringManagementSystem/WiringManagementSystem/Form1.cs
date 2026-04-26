@@ -10,9 +10,6 @@ namespace WiringManagementSystem
 {
     public partial class WMForm : Form
     {
-        // Forces the application to look in the same directory as this class for the Wiring Management Database (WMDB) file
-        readonly string connectionString = $"Data Source={Path.Combine(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..\\..\\..\\")), "WMDB.sqlite")}";
-
         // Prepare queries and lists for loading the racks and devices from the database
         string rackQuery = "SELECT * FROM Racks";
         string deviceQuery = "SELECT * FROM Devices";
@@ -26,7 +23,7 @@ namespace WiringManagementSystem
             try
             {
                 // Open a connection to WMDB
-                using var connection = new SqliteConnection(connectionString);
+                using var connection = new SqliteConnection(Globals.connectionString);
                 connection.Open();
 
                 // Declare queries to be used on WMDB
@@ -87,6 +84,13 @@ namespace WiringManagementSystem
             }
 
             BuildTreeView(racks, devices);
+        }
+
+        public List<Device> QueryDevices()
+        {
+            var queriedDevices = new List<Device>();
+
+
         }
 
         // Builds the tree view based on the supplied lists of racks and devices

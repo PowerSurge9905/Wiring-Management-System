@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Data.Sqlite;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -33,17 +34,22 @@ namespace WiringManagementSystem
                 return;
             }
 
-            // Build new device based on form inputs
-            CreatedDevice = new Device
+            using (var connection = new SqliteConnection(Globals.connectionString))
             {
-                
-                DeviceID = Guid.NewGuid().ToString(),  // Auto generated ID
-                RackID = txtAddRack.Text,
-                PodID = txtAddPod.Text,
-                Type = (DeviceType)comboBoxAddDeviceType.SelectedItem,
-                DeviceName = txtAddDeviceName.Text      
-                
-            };
+
+            }
+
+                // Build new device based on form inputs
+                CreatedDevice = new Device
+                {
+
+                    DeviceID = Guid.NewGuid().ToString(),  // Auto generated ID
+                    RackID = txtAddRack.Text,
+                    PodID = txtAddPod.Text,
+                    Type = (DeviceType)comboBoxAddDeviceType.SelectedItem,
+                    DeviceName = txtAddDeviceName.Text
+
+                };
 
             // Tell the main form we successfully created a device
             this.DialogResult = DialogResult.OK;
