@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Design;
 
 namespace WiringManagementSystem.Classes
 {
-    internal class WMContextFactory : IDesignTimeDbContextFactory<WMContext>
+    public class WMContextFactory : IDesignTimeDbContextFactory<WMContext>
     {
         public WMContext CreateDbContext(string[] args)
         {

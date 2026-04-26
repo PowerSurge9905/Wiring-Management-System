@@ -126,6 +126,7 @@
             Controls.Add(btnAddDevice);
             Controls.Add(lst_Description);
             Controls.Add(tree_WiringManagement);
+            KeyPreview = true;
             Name = "WMForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Wiring Management System";

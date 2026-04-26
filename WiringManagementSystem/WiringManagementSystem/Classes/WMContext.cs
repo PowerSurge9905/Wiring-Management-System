@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 namespace WiringManagementSystem.Classes
 {
-    internal class WMContext : DbContext
+    public class WMContext : DbContext
     {
         public WMContext()
         {
@@ -17,6 +12,8 @@ namespace WiringManagementSystem.Classes
             : base(options)
         {
         }
+
+        readonly string connectionString = $"Data Source={Path.Combine(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..\\..\\..\\")), "WMDB.sqlite")}";
 
         public DbSet<Rack> Racks { get; set; }
         public DbSet<Device> Devices { get; set; }
@@ -48,14 +45,14 @@ namespace WiringManagementSystem.Classes
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlite("Data Source=WMDB.sqlite");
+                optionsBuilder.UseSqlite(connectionString);
             }
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Rack>().HasData(
-                new Rack { RackID = Rack1ID, RackName = "Rack 1" },
+                new Rack { RackID = Rack1ID, RackName = "Rack 1", Notes = new List<string> { "Note1", "Note2" } },
                 new Rack { RackID = Rack2ID, RackName = "Rack 2" },
                 new Rack { RackID = Rack3ID, RackName = "Rack 3" },
                 new Rack { RackID = Rack4ID, RackName = "Rack 4" },
@@ -69,7 +66,7 @@ namespace WiringManagementSystem.Classes
                 new Device { DeviceID = PodBID, DeviceName = "Pod B", Type = DeviceType.Pod, RackID = Rack1ID }, // Pod B
                 new Device { DeviceID = PodCID, DeviceName = "Pod C", Type = DeviceType.Pod, RackID = Rack1ID }, // Pod C
                 new Device { DeviceID = PodDID, DeviceName = "Pod D", Type = DeviceType.Pod, RackID = Rack1ID }, // Pod D
-                new Device { DeviceID = "RT00", DeviceName = "Cisco 1900 Series Router - Rack 1", Type = DeviceType.Router, RackID = Rack1ID }, 
+                new Device { DeviceID = "RT00", DeviceName = "Cisco 1900 Series Router - Rack 1", Type = DeviceType.Router, RackID = Rack1ID},
                 new Device { DeviceID = "SW00", DeviceName = "Catalyst 2900 Plus Series Switch - Rack 1", Type = DeviceType.Switch, RackID = Rack1ID },
                 new Device { DeviceID = "FRWA", DeviceName = "ASA 5505 Series Firewall - Bloc A", Type = DeviceType.Firewall, RackID = Rack1ID }, // Pod A firewall
                 new Device { DeviceID = "FRWB", DeviceName = "ASA 5505 Series Firewall - Bloc B", Type = DeviceType.Firewall, RackID = Rack1ID }, // Pod B firewall

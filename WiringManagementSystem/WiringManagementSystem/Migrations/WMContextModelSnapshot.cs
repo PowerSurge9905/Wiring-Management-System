@@ -25,6 +25,9 @@ namespace WiringManagementSystem.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Notes")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("PodID")
                         .HasColumnType("TEXT");
 
@@ -35,8 +38,6 @@ namespace WiringManagementSystem.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("DeviceID");
-
-                    b.HasIndex("RackID");
 
                     b.ToTable("Devices");
 
@@ -1145,7 +1146,7 @@ namespace WiringManagementSystem.Migrations
                     b.Property<string>("RackID")
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("DevicesID")
+                    b.Property<string>("Notes")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("RackName")
@@ -1160,6 +1161,7 @@ namespace WiringManagementSystem.Migrations
                         new
                         {
                             RackID = "RK01",
+                            Notes = "[\"Note1\",\"Note2\"]",
                             RackName = "Rack 1"
                         },
                         new
@@ -1187,18 +1189,6 @@ namespace WiringManagementSystem.Migrations
                             RackID = "RK06",
                             RackName = "Rack 6"
                         });
-                });
-
-            modelBuilder.Entity("WiringManagementSystem.Classes.Device", b =>
-                {
-                    b.HasOne("WiringManagementSystem.Classes.Rack", null)
-                        .WithMany("Devices")
-                        .HasForeignKey("RackID");
-                });
-
-            modelBuilder.Entity("WiringManagementSystem.Classes.Rack", b =>
-                {
-                    b.Navigation("Devices");
                 });
 #pragma warning restore 612, 618
         }
