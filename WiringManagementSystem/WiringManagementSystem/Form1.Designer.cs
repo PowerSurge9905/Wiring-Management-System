@@ -59,7 +59,7 @@
             // 
             // btnAddDevice
             // 
-            btnAddDevice.Location = new Point(11, 427);
+            btnAddDevice.Location = new Point(12, 429);
             btnAddDevice.Name = "btnAddDevice";
             btnAddDevice.Size = new Size(110, 23);
             btnAddDevice.TabIndex = 2;
@@ -69,7 +69,7 @@
             // 
             // btnEditDevice
             // 
-            btnEditDevice.Location = new Point(146, 427);
+            btnEditDevice.Location = new Point(147, 429);
             btnEditDevice.Name = "btnEditDevice";
             btnEditDevice.Size = new Size(110, 23);
             btnEditDevice.TabIndex = 3;
@@ -79,16 +79,17 @@
             // 
             // btnAddNotes
             // 
-            btnAddNotes.Location = new Point(281, 427);
-            btnAddNotes.Name = "btnAddNotes";
-            btnAddNotes.Size = new Size(110, 23);
-            btnAddNotes.TabIndex = 4;
-            btnAddNotes.Text = "Add Notes";
-            btnAddNotes.UseVisualStyleBackColor = true;
+            btnEditConnection.Location = new Point(282, 429);
+            btnEditConnection.Name = "btnEditConnection";
+            btnEditConnection.Size = new Size(110, 23);
+            btnEditConnection.TabIndex = 4;
+            btnEditConnection.Text = "Edit Connections";
+            btnEditConnection.UseVisualStyleBackColor = true;
+            btnEditConnection.Click += btnEditConnection_Click;
             // 
             // btnDeleteDevice
             // 
-            btnDeleteDevice.Location = new Point(414, 427);
+            btnDeleteDevice.Location = new Point(415, 429);
             btnDeleteDevice.Name = "btnDeleteDevice";
             btnDeleteDevice.Size = new Size(110, 23);
             btnDeleteDevice.TabIndex = 5;
@@ -98,16 +99,16 @@
             // 
             // txtBox
             // 
-            txtBox.Location = new Point(12, 328);
+            txtBox.Location = new Point(12, 321);
             txtBox.Multiline = true;
             txtBox.Name = "txtBox";
-            txtBox.Size = new Size(512, 82);
+            txtBox.Size = new Size(513, 102);
             txtBox.TabIndex = 6;
             // 
             // lblNotes
             // 
             lblNotes.AutoSize = true;
-            lblNotes.Location = new Point(12, 310);
+            lblNotes.Location = new Point(12, 303);
             lblNotes.Name = "lblNotes";
             lblNotes.Size = new Size(41, 15);
             lblNotes.TabIndex = 7;
@@ -117,7 +118,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(536, 483);
+            ClientSize = new Size(537, 468);
             Controls.Add(lblNotes);
             Controls.Add(txtBox);
             Controls.Add(btnDeleteDevice);
