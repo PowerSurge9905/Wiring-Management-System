@@ -1,8 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.EntityFrameworkCore;
-using WiringManagementSystem.Classes;
-
 namespace WiringManagementSystem
 {
     public static class Program

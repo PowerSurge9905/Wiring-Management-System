@@ -33,13 +33,15 @@
             lst_Description = new ListBox();
             btnAddDevice = new Button();
             btnEditDevice = new Button();
-            btnEditConnection = new Button();
             btnDeleteDevice = new Button();
-            txtBox = new TextBox();
+            lblNotes = new Label();
+            btnEditNotes = new Button();
+            lstNotes = new ListBox();
             SuspendLayout();
             // 
             // tree_WiringManagement
             // 
+            tree_WiringManagement.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             tree_WiringManagement.Font = new Font("Courier New", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
             tree_WiringManagement.Location = new Point(12, 12);
             tree_WiringManagement.Name = "tree_WiringManagement";
@@ -49,16 +51,18 @@
             // 
             // lst_Description
             // 
+            lst_Description.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             lst_Description.Font = new Font("Courier New", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
             lst_Description.FormattingEnabled = true;
             lst_Description.Location = new Point(12, 216);
             lst_Description.Name = "lst_Description";
             lst_Description.Size = new Size(513, 84);
             lst_Description.TabIndex = 1;
+            lst_Description.TabStop = false;
             // 
             // btnAddDevice
             // 
-            btnAddDevice.Location = new Point(12, 355);
+            btnAddDevice.Location = new Point(12, 429);
             btnAddDevice.Name = "btnAddDevice";
             btnAddDevice.Size = new Size(110, 23);
             btnAddDevice.TabIndex = 2;
@@ -68,7 +72,7 @@
             // 
             // btnEditDevice
             // 
-            btnEditDevice.Location = new Point(147, 355);
+            btnEditDevice.Location = new Point(146, 429);
             btnEditDevice.Name = "btnEditDevice";
             btnEditDevice.Size = new Size(110, 23);
             btnEditDevice.TabIndex = 3;
@@ -76,19 +80,9 @@
             btnEditDevice.UseVisualStyleBackColor = true;
             btnEditDevice.Click += btnEditDevice_Click;
             // 
-            // btnEditConnection
-            // 
-            btnEditConnection.Location = new Point(282, 355);
-            btnEditConnection.Name = "btnEditConnection";
-            btnEditConnection.Size = new Size(110, 23);
-            btnEditConnection.TabIndex = 4;
-            btnEditConnection.Text = "Edit Connections";
-            btnEditConnection.UseVisualStyleBackColor = true;
-            btnEditConnection.Click += btnEditConnection_Click;
-            // 
             // btnDeleteDevice
             // 
-            btnDeleteDevice.Location = new Point(415, 355);
+            btnDeleteDevice.Location = new Point(415, 429);
             btnDeleteDevice.Name = "btnDeleteDevice";
             btnDeleteDevice.Size = new Size(110, 23);
             btnDeleteDevice.TabIndex = 5;
@@ -96,27 +90,52 @@
             btnDeleteDevice.UseVisualStyleBackColor = true;
             btnDeleteDevice.Click += btnDeleteDevice_Click;
             // 
-            // txtBox
+            // lblNotes
             // 
-            txtBox.Location = new Point(12, 316);
-            txtBox.Name = "txtBox";
-            txtBox.Size = new Size(245, 23);
-            txtBox.TabIndex = 6;
+            lblNotes.AutoSize = true;
+            lblNotes.Location = new Point(12, 303);
+            lblNotes.Name = "lblNotes";
+            lblNotes.Size = new Size(41, 15);
+            lblNotes.TabIndex = 7;
+            lblNotes.Text = "Notes:";
+            // 
+            // btnEditNotes
+            // 
+            btnEditNotes.Location = new Point(280, 429);
+            btnEditNotes.Name = "btnEditNotes";
+            btnEditNotes.Size = new Size(110, 23);
+            btnEditNotes.TabIndex = 8;
+            btnEditNotes.Text = "Edit Notes";
+            btnEditNotes.UseVisualStyleBackColor = true;
+            // 
+            // lstNotes
+            // 
+            lstNotes.FormattingEnabled = true;
+            lstNotes.HorizontalScrollbar = true;
+            lstNotes.ItemHeight = 15;
+            lstNotes.Location = new Point(12, 321);
+            lstNotes.Name = "lstNotes";
+            lstNotes.Size = new Size(513, 94);
+            lstNotes.TabIndex = 9;
             // 
             // WMForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(537, 402);
-            Controls.Add(txtBox);
+            ClientSize = new Size(537, 468);
+            Controls.Add(lstNotes);
+            Controls.Add(btnEditNotes);
+            Controls.Add(lblNotes);
             Controls.Add(btnDeleteDevice);
-            Controls.Add(btnEditConnection);
             Controls.Add(btnEditDevice);
             Controls.Add(btnAddDevice);
             Controls.Add(lst_Description);
             Controls.Add(tree_WiringManagement);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             KeyPreview = true;
+            MaximizeBox = false;
             Name = "WMForm";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "Wiring Management System";
             ResumeLayout(false);
             PerformLayout();
@@ -129,8 +148,9 @@
         private ListBox lst_Description;
         private Button btnAddDevice;
         private Button btnEditDevice;
-        private Button btnEditConnection;
         private Button btnDeleteDevice;
-        private TextBox txtBox;
+        private Label lblNotes;
+        private Button btnEditNotes;
+        private ListBox lstNotes;
     }
 }

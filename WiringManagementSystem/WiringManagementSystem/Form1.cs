@@ -6,11 +6,6 @@ namespace WiringManagementSystem
 {
     public partial class WMForm : Form
     {
-        // Forces the application to look in the same directory as this class for the Wiring Management Database (WMDB) file
-        readonly string connectionString = $"Data Source={Path.Combine(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..\\..\\..\\")), "WMDB.sqlite")}";
-
-        //readonly string connectionString = "Data Source=WMDB.sqlite";
-
         // Prepare queries and lists for loading the racks and devices from the database
         string rackQuery = "SELECT * FROM Racks";
         string deviceQuery = "SELECT * FROM Devices";
@@ -24,7 +19,7 @@ namespace WiringManagementSystem
             try
             {
                 // Open a connection to WMDB
-                using var connection = new SqliteConnection(connectionString);
+                using var connection = new SqliteConnection(Globals.connectionString);
                 connection.Open();
 
                 // Declare queries to be used on WMDB
@@ -66,11 +61,11 @@ namespace WiringManagementSystem
                         var podID = deviceReader.IsDBNull(4) ? null : deviceReader.GetString(4);
                         /* 
                          * Important: Notes cannot be stored as a list in the database
-                         * Instead, they are stored as a single string delimited by the Unicode character '•' (U+2022) (Alt Code 0149)
+                         * Instead, they are stored as a single string delimited by the Unicode character 'â€¢' (U+2022) (Alt Code 0149)
                          * It was chosen because it is unlikely to be used in any notes, and does not appear on a US QWERTY keyboard
                          * The following code splits the notes string back into a list for ease of use
                          */
-                        var notes = deviceReader.IsDBNull(5) ? null : deviceReader.GetString(5).Split('•').ToList();
+                        var notes = deviceReader.IsDBNull(5) ? null : deviceReader.GetString(5).Split('â€¢').ToList();
                         devices.Add(new Device { DeviceID = deviceID, DeviceName = deviceName, Type = type, RackID = rackID, PodID = podID, Notes = notes });
                     }
                 }
@@ -87,6 +82,13 @@ namespace WiringManagementSystem
 
             BuildTreeView(racks, devices);
         }
+
+        //public List<Device> QueryDevices()
+        //{
+        //    var queriedDevices = new List<Device>();
+
+
+        //}
 
         // Builds the tree view based on the supplied lists of racks and devices
         public void BuildTreeView(List<Rack> racks, List<Device> devices)
@@ -259,6 +261,7 @@ namespace WiringManagementSystem
                 {
                     if (targetParent != null)
                     {
+                        // Find the Rack or Pod and insert the new node as a child of that Rack or Pod
                         targetParent.Nodes.Add(node);
                         targetParent.Expand();
                     }
@@ -395,9 +398,9 @@ namespace WiringManagementSystem
 
         // Edits the selected node's text to match what's in text box
         // TODO: Change this to open a new window which allows the user to enter notes for connections
-        private void btnEditConnection_Click(object sender, EventArgs e)
+        private void btnEditNotes_Click(object sender, EventArgs e)
         {
-            tree_WiringManagement.SelectedNode.Text = txtBox.Text;
+            tree_WiringManagement.SelectedNode.Text = lstNotes.Text;
         }
 
         // Delete the selected node and all of its children
@@ -474,6 +477,7 @@ namespace WiringManagementSystem
                     MessageBox.Show("Error deleting from database: " + ex.Message, "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+            
         }
 
         private DialogResult confirmDeletion(DialogResult result, bool showChildNodes)

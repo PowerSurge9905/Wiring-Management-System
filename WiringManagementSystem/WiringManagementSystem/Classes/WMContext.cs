@@ -46,8 +46,7 @@ namespace WiringManagementSystem.Classes
         {
             if (!optionsBuilder.IsConfigured)
             {
-                //optionsBuilder.UseSqlite($"Data Source={connectionString}");
-                optionsBuilder.UseSqlite("Data Source=WMDB.sqlite");
+                optionsBuilder.UseSqlite(Globals.connectionString);
             }
         }
 

@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Microsoft.Data.Sqlite;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using WiringManagementSystem.Classes;
-
 
 namespace WiringManagementSystem
 {
@@ -66,6 +66,13 @@ namespace WiringManagementSystem
             // Grab the hidden Pod ID from the dropdown
             string selectedPodId = cmbAddPod.SelectedValue?.ToString();
 
+            // Just incase the combobox gets set to an incorrect value
+            if (comboBoxAddDeviceType.SelectedItem == null)
+            {
+                MessageBox.Show("Please select a device type.", "Missing Information", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            
             // Build new device based on form inputs
             CreatedDevice = new Device
             {
@@ -74,10 +81,18 @@ namespace WiringManagementSystem
                 PodID = string.IsNullOrEmpty(selectedPodId) ? null : selectedPodId,
                 Type = (DeviceType)cmbAddDeviceType.SelectedItem,
                 DeviceName = txtAddDeviceName.Text
-
-                
             };
+            
+            // Check if rack here
 
+            using (var connection = new SqliteConnection(Globals.connectionString))
+            {
+                connection.Open();
+                var command = connection.CreateCommand();
+                    command.CommandText = "INSERT INTO";
+            }
+
+            // Tell the main form we successfully created a device
             this.DialogResult = DialogResult.OK;
             this.Close();
         }
@@ -86,6 +101,11 @@ namespace WiringManagementSystem
         {
             this.DialogResult = DialogResult.Cancel;
             this.Close();
+        }
+
+        private void txtAddRack_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
