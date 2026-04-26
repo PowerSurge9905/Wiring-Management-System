@@ -10,7 +10,7 @@ using WiringManagementSystem.Classes;
 namespace WiringManagementSystem.Migrations
 {
     [DbContext(typeof(WMContext))]
-    [Migration("20260422185731_Initial")]
+    [Migration("20260426213007_Initial")]
     partial class Initial
     {
         /// <inheritdoc />

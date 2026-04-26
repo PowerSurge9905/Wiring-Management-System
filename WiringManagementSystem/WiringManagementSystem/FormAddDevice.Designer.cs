@@ -35,9 +35,9 @@
             lblAddDeviceType = new Label();
             lblAddRackNumber = new Label();
             lblAddPod = new Label();
-            txtAddPod = new TextBox();
-            txtAddRack = new TextBox();
-            comboBoxAddDeviceType = new ComboBox();
+            cmbAddDeviceType = new ComboBox();
+            cmbAddRack = new ComboBox();
+            cmbAddPod = new ComboBox();
             SuspendLayout();
             // 
             // lblAddDeviceName
@@ -103,29 +103,32 @@
             lblAddPod.TabIndex = 7;
             lblAddPod.Text = "Pod:";
             // 
-            // txtAddPod
+            // cmbAddDeviceType
             // 
-            txtAddPod.Location = new Point(112, 56);
-            txtAddPod.Name = "txtAddPod";
-            txtAddPod.Size = new Size(153, 23);
-            txtAddPod.TabIndex = 1;
+            cmbAddDeviceType.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbAddDeviceType.FormattingEnabled = true;
+            cmbAddDeviceType.Location = new Point(112, 96);
+            cmbAddDeviceType.Name = "cmbAddDeviceType";
+            cmbAddDeviceType.Size = new Size(153, 23);
+            cmbAddDeviceType.TabIndex = 2;
             // 
-            // txtAddRack
+            // cmbAddRack
             // 
-            txtAddRack.Location = new Point(112, 20);
-            txtAddRack.Name = "txtAddRack";
-            txtAddRack.Size = new Size(153, 23);
-            txtAddRack.TabIndex = 0;
-            txtAddRack.TextChanged += txtAddRack_TextChanged;
+            cmbAddRack.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbAddRack.FormattingEnabled = true;
+            cmbAddRack.Location = new Point(112, 25);
+            cmbAddRack.Name = "cmbAddRack";
+            cmbAddRack.Size = new Size(153, 23);
+            cmbAddRack.TabIndex = 8;
             // 
-            // comboBoxAddDeviceType
+            // cmbAddPod
             // 
-            comboBoxAddDeviceType.DropDownStyle = ComboBoxStyle.DropDownList;
-            comboBoxAddDeviceType.FormattingEnabled = true;
-            comboBoxAddDeviceType.Location = new Point(112, 96);
-            comboBoxAddDeviceType.Name = "comboBoxAddDeviceType";
-            comboBoxAddDeviceType.Size = new Size(153, 23);
-            comboBoxAddDeviceType.TabIndex = 2;
+            cmbAddPod.DropDownStyle = ComboBoxStyle.DropDownList;
+            cmbAddPod.FormattingEnabled = true;
+            cmbAddPod.Location = new Point(112, 61);
+            cmbAddPod.Name = "cmbAddPod";
+            cmbAddPod.Size = new Size(153, 23);
+            cmbAddPod.TabIndex = 9;
             // 
             // FrmAddDevice
             // 
@@ -134,9 +137,9 @@
             AutoScaleMode = AutoScaleMode.Font;
             CancelButton = btnCancel;
             ClientSize = new Size(321, 229);
-            Controls.Add(comboBoxAddDeviceType);
-            Controls.Add(txtAddRack);
-            Controls.Add(txtAddPod);
+            Controls.Add(cmbAddPod);
+            Controls.Add(cmbAddRack);
+            Controls.Add(cmbAddDeviceType);
             Controls.Add(lblAddPod);
             Controls.Add(lblAddRackNumber);
             Controls.Add(lblAddDeviceType);
@@ -162,6 +165,8 @@
         private Label lblAddPod;
         private TextBox txtAddPod;
         private TextBox txtAddRack;
-        private ComboBox comboBoxAddDeviceType;
+        private ComboBox cmbAddDeviceType;
+        private ComboBox cmbAddRack;
+        private ComboBox cmbAddPod;
     }
 }

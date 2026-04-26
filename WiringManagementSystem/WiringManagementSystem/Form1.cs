@@ -1,10 +1,6 @@
-using Microsoft.EntityFrameworkCore;
 using WiringManagementSystem.Classes;
 using Microsoft.Data.Sqlite;
-using Microsoft.IdentityModel.Tokens;
-using System.Configuration;
-using Microsoft.Identity.Client;
-using Microsoft.Extensions.Configuration.EnvironmentVariables;
+
 
 namespace WiringManagementSystem
 {
@@ -76,7 +72,8 @@ namespace WiringManagementSystem
             }
             catch (SqliteException ex)
             {
-                MessageBox.Show("Database error: " + ex.Message, "Database Error!");
+                lst_Description.Items.Add("Database failed to load!");
+                lst_Description.Items.Add("Try restarting the application.");
             }
             catch (Exception ex)
             {
@@ -166,7 +163,7 @@ namespace WiringManagementSystem
                 }
             }
 
-            //If there is no node under the mouse, clear the selection
+            // If there is no node under the mouse, clear the selection
             if (clickedNode == null)
             {
                 tree_WiringManagement.SelectedNode = null;
@@ -174,23 +171,55 @@ namespace WiringManagementSystem
         }
 
         // Add a new node to the tree view, either as a child of the selected node or as a new root node if no node is selected
-        // NOTE: Must use the correct ID for RackID: ex."RK01" and PodID: ex."PODA" for the TreeView to recongize where to insert node.
         private void btnAddDevice_Click(object sender, EventArgs e)
         {
-            // Open the form
-            FrmAddDevice addDeviceForm = new FrmAddDevice();
+            string targetRackId = "";
+            string targetPodId = "";
+
+            TreeNode selectedNode = tree_WiringManagement.SelectedNode;
+    
+            // Check what the user clicked to extract the IDs for Auto-fill
+            if (selectedNode != null)
+            {
+                if (selectedNode.Parent == null) // They clicked a Root Node (A Rack)
+                {
+                    targetRackId = selectedNode.Tag?.ToString();
+                }
+                else // They clicked a Child Node (A Device or a Pod)
+                {
+                    var tagArray = selectedNode.Tag as object[];
+                    if (tagArray != null)
+                    {
+                        if (tagArray[1].ToString() == DeviceType.Pod.ToString())
+                        {
+                            targetPodId = tagArray[0]?.ToString();  // The Pod's DeviceID
+                            targetRackId = tagArray[2]?.ToString(); // The Rack it belongs to
+                        }
+                        else 
+                        {
+                            targetRackId = tagArray[2]?.ToString(); // A regular device's Rack
+                            targetPodId = tagArray[3]?.ToString();  // A regular device's Pod
+                        }
+                    }
+                }
+            }
+
+            // Open the form and pass the IDs
+            FrmAddDevice addDeviceForm = new FrmAddDevice(targetRackId, targetPodId);
 
             // Wait for the user to hit "Add"
             if (addDeviceForm.ShowDialog() == DialogResult.OK)
             {
-                // Grab the new device data
                 Device newDevice = addDeviceForm.CreatedDevice;
 
-                // Save to database immediately
+                // Save to the SQLite database immediately
                 try
                 {
-                    //wmdb.Devices.Add(newDevice);
-                    //wmdb.SaveChanges();
+                    using (WMContext wmdb = new WMContext())
+                    {
+                        wmdb.Devices.Add(newDevice);
+                        wmdb.SaveChanges();
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -198,36 +227,32 @@ namespace WiringManagementSystem
                     return; // Stop running if the database fails
                 }
 
-                // Create the node with DeviceName and Tag array
+                // Create the visible node and assign the hidden Tag array
                 TreeNode node = new TreeNode(newDevice.DeviceName);
                 node.Tag = new[] { newDevice.DeviceID, newDevice.Type.ToString(), newDevice.RackID, newDevice.PodID };
 
-                // Find the correct Rack and Pod
+                // Search the tree to find exactly where to put the new node
                 TreeNode targetParent = null;
 
-                // Search through all Root Nodes (Racks)
                 foreach (TreeNode rackNode in tree_WiringManagement.Nodes)
                 {
-                    
                     if (rackNode.Tag != null && rackNode.Tag.ToString() == newDevice.RackID)
                     {
-                        targetParent = rackNode; // Target parent becomes the Rack node by default
+                        targetParent = rackNode; // Target parent becomes the Rack node
 
-                        // If the user also typed in a PodID, we need to search inside this Rack
                         if (!string.IsNullOrEmpty(newDevice.PodID))
                         {
                             foreach (TreeNode podNode in rackNode.Nodes)
                             {
                                 var tagData = podNode.Tag as object[];
-                                // tagData[0] is the DeviceID. We check if it matches the PodID they entered
                                 if (tagData != null && tagData.Length > 0 && tagData[0].ToString() == newDevice.PodID)
                                 {
-                                    targetParent = podNode; // Target parent becomes the Pod node instead of the Rack node
-                                    break; // Stop searching pods
+                                    targetParent = podNode; // Target parent becomes the Pod node instead
+                                    break; 
                                 }
                             }
                         }
-                        break; // Stop searching racks
+                        break; // Stop searching racks once we found the right one
                     }
                 }
 
@@ -242,7 +267,7 @@ namespace WiringManagementSystem
                     }
                     else
                     {
-                        // Fallback: If they typed a Rack that doesn't exist, just add it to the main tree
+                        // Add it to the main tree if a parent wasn't found
                         tree_WiringManagement.Nodes.Add(node);
                     }
                 }
@@ -253,13 +278,122 @@ namespace WiringManagementSystem
             }
         }
 
-        // Edits the selected node's text to match what's in text box
-        // TODO: Change this to open a new window which allows the user to edit details for a new node
+        // Edits the selected node's and updates the tree view and database accordingly
         private void btnEditDevice_Click(object sender, EventArgs e)
         {
-            //tree_WiringManagement.SelectedNode.Text = txtBox.Text;
-            FrmEditDevice editDeviceForm = new FrmEditDevice();
-            editDeviceForm.ShowDialog();
+            TreeNode selectedNode = tree_WiringManagement.SelectedNode;
+
+            // If nothing is selected, show a warning message and exit the method
+            if (selectedNode == null)
+            {
+                MessageBox.Show("Please select a device to edit.", "Selection Missing", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            if (selectedNode.Parent == null)
+            {
+                MessageBox.Show("This button is for editing devices. Please select a device, not a rack.", "Invalid Selection", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // Extract the ID from the selected node's Tag array
+            var tagArray = selectedNode.Tag as object[];
+            if (tagArray == null) return;
+
+            string deviceId = tagArray[0]?.ToString(); // tag[0] is always the DeviceID
+
+            using (WMContext db = new WMContext())
+            {
+                // Fetch the exact device from the database
+                Device deviceToEdit = db.Devices.Find(deviceId);
+
+                if (deviceToEdit == null)
+                {
+                    MessageBox.Show("Device not found in database!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
+                // Open your edit form and pass the device in
+                FrmEditDevice editForm = new FrmEditDevice(deviceToEdit);
+
+                if (editForm.ShowDialog() == DialogResult.OK)
+                {
+                    // Grab the updated data from the form
+                    Device updatedDevice = editForm.EditedDevice;
+
+                    try
+                    {
+                        // Save the changes to the database first
+                        db.Entry(deviceToEdit).CurrentValues.SetValues(updatedDevice);
+                        db.SaveChanges();
+
+                        // Figure out if the device was moved to a new Rack or Pod
+                        string oldRackId = tagArray[2]?.ToString();
+                        string oldPodId = tagArray[3]?.ToString();
+                        bool locationChanged = (oldRackId != updatedDevice.RackID) || (oldPodId != updatedDevice.PodID);
+
+                        // Instantly update the text on the screen and the hidden Tag data
+                        selectedNode.Text = updatedDevice.DeviceName;
+                        selectedNode.Tag = new[] { updatedDevice.DeviceID, updatedDevice.Type.ToString(), updatedDevice.RackID, updatedDevice.PodID };
+
+                        // If it moved, we need to physically move the node on the treeview UI
+                        if (locationChanged)
+                        {
+                            // Remove it out of its current folder
+                            selectedNode.Remove();
+
+                            // Search the tree to find exactly where to put the updated node based on its new RackID and PodID
+                            TreeNode targetParent = null;
+
+                            foreach (TreeNode rackNode in tree_WiringManagement.Nodes)
+                            {
+                                if (rackNode.Tag != null && rackNode.Tag.ToString() == updatedDevice.RackID)
+                                {
+                                    targetParent = rackNode; // Target parent becomes the Rack node
+
+                                    if (!string.IsNullOrEmpty(updatedDevice.PodID))
+                                    {
+                                        foreach (TreeNode podNode in rackNode.Nodes)
+                                        {
+                                            var podTagData = podNode.Tag as object[];
+                                            if (podTagData != null && podTagData.Length > 0 && podTagData[0].ToString() == updatedDevice.PodID)
+                                            {
+                                                targetParent = podNode; // Target parent becomes the Pod node instead
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    break; // Stop searching racks once we found the right one
+                                }
+                            }
+
+                            // Drop the node exactly where it belongs
+                            if (targetParent != null)
+                            {
+                                targetParent.Nodes.Add(selectedNode);
+                                targetParent.Expand();
+                            }
+                            else
+                            {
+                                // Add it to the main tree if parent wasn't found
+                                tree_WiringManagement.Nodes.Add(selectedNode);
+                            }
+                        }
+
+                        // Keep the edited node highlighted and visible on the screen
+                        tree_WiringManagement.SelectedNode = selectedNode;
+                        selectedNode.EnsureVisible();
+                        tree_WiringManagement.Focus();
+
+                        // Clear the description box since the data just changed
+                        lst_Description.Items.Clear();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error saving changes: " + ex.Message, "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
         }
 
         // Edits the selected node's text to match what's in text box
@@ -272,16 +406,18 @@ namespace WiringManagementSystem
         // Delete the selected node and all of its children
         private void btnDeleteDevice_Click(object sender, EventArgs e)
         {
-            DialogResult result = DialogResult.None;
+            
             var selectedNode = tree_WiringManagement.SelectedNode;
-
-            if (selectedNode == null)
+            if(selectedNode == null)
             {
-                MessageBox.Show("Please select a node to delete.");
+                MessageBox.Show("Please select a node to delete.", "Selection Missing", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
+            
+            // Asks for comfirmation
+            DialogResult result = DialogResult.None;
 
-            if (selectedNode.GetNodeCount(true) > 0)
+            if(selectedNode.GetNodeCount(true) > 0)
             {
                 result = confirmDeletion(result, true);
             }
@@ -290,38 +426,47 @@ namespace WiringManagementSystem
                 result = confirmDeletion(result, false);
             }
 
+            // If they click "Yes", proceed with deletion
             if (result == DialogResult.Yes)
             {
                 try
                 {
-                    // Delete from DB
-                    // Check if root node is a rack
-                    //if(selectedNode.Parent == null)
-                    //{
-                    //    string rackId = selectedNode.Tag.ToString();
-                    //    var rackToDelete = wmdb.Racks.Find(rackId);
-                    //    if (rackToDelete != null)
-                    //    {
-                    //        wmdb.Racks.Remove(rackToDelete);
-                    //    }
-                    //}
-                    //else // If it's not a rack, it's a device/pod
-                    //{
-                    //    var tagArray = selectedNode.Tag as object[];
-                    //    if (tagArray != null)
-                    //    {
-                    //        string deviceId = tagArray[0].ToString(); // tag[0] is the DeviceID
-                    //        var deviceToDelete = wmdb.Devices.Find(deviceId);
-                    //        if(deviceToDelete != null)
-                    //        {
-                    //            wmdb.Devices.Remove(deviceToDelete);
-                    //        }
-                    //    }
-                    //}
-                    // Save changes to the DB after deletion
-                    //wmdb.SaveChanges();
+                    using (var db = new WMContext())
+                    {
+                        // Is it a Root Node (A Rack)?
+                        if (selectedNode.Parent == null)
+                        {
+                            // Racks store just their string ID in the Tag
+                            string rackId = selectedNode.Tag?.ToString();
+                            var rackToDelete = db.Racks.Find(rackId);
 
-                    // Remove from TreeView UI
+                            if (rackToDelete != null)
+                            {
+                                db.Racks.Remove(rackToDelete);
+                            }
+                        }
+                        // Otherwise, it is a Child Node (A Device or Pod)
+                        else
+                        {
+                            // Devices/Pods store an array of data in the Tag
+                            var tagArray = selectedNode.Tag as object[];
+                            if (tagArray != null)
+                            {
+                                string deviceId = tagArray[0]?.ToString(); // tag[0] is the DeviceID
+                                var deviceToDelete = db.Devices.Find(deviceId);
+
+                                if (deviceToDelete != null)
+                                {
+                                    db.Devices.Remove(deviceToDelete);
+                                }
+                            }
+                        }
+
+                        // Delete it from the database file
+                        db.SaveChanges();
+                    }
+
+                    // Visually remove the node from the treeview UI
                     selectedNode.Remove();
 
                     // Clear the description box
@@ -330,7 +475,7 @@ namespace WiringManagementSystem
                 catch (Exception ex)
                 {
                     MessageBox.Show("Error deleting from database: " + ex.Message, "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }   
+                }
             }
             
         }
