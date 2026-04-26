@@ -10,8 +10,8 @@ using WiringManagementSystem.Classes;
 namespace WiringManagementSystem.Migrations
 {
     [DbContext(typeof(WMContext))]
-    [Migration("20260423195512_InitialSetup")]
-    partial class InitialSetup
+    [Migration("20260426213007_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

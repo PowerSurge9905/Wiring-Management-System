@@ -7,9 +7,9 @@ namespace WiringManagementSystem
     public partial class WMForm : Form
     {
         // Forces the application to look in the same directory as this class for the Wiring Management Database (WMDB) file
-        //readonly string connectionString = $"Data Source={Path.Combine(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..\\..\\..\\")), "WMDB.sqlite")}";
+        readonly string connectionString = $"Data Source={Path.Combine(Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..\\..\\..\\")), "WMDB.sqlite")}";
 
-        readonly string connectionString = "Data Source=WMDB.sqlite";
+        //readonly string connectionString = "Data Source=WMDB.sqlite";
 
         // Prepare queries and lists for loading the racks and devices from the database
         string rackQuery = "SELECT * FROM Racks";

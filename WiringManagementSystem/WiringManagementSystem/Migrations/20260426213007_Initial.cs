@@ -196,7 +196,7 @@ namespace WiringManagementSystem.Migrations
                 columns: new[] { "RackID", "Notes", "RackName" },
                 values: new object[,]
                 {
-                    { "RK01", null, "Rack 1" },
+                    { "RK01", "[\"Note1\",\"Note2\"]", "Rack 1" },
                     { "RK02", null, "Rack 2" },
                     { "RK03", null, "Rack 3" },
                     { "RK04", null, "Rack 4" },
