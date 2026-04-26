@@ -33,9 +33,10 @@
             lst_Description = new ListBox();
             btnAddDevice = new Button();
             btnEditDevice = new Button();
-            btnEditConnection = new Button();
+            btnAddNotes = new Button();
             btnDeleteDevice = new Button();
             txtBox = new TextBox();
+            lblNotes = new Label();
             SuspendLayout();
             // 
             // tree_WiringManagement
@@ -58,7 +59,7 @@
             // 
             // btnAddDevice
             // 
-            btnAddDevice.Location = new Point(12, 355);
+            btnAddDevice.Location = new Point(11, 427);
             btnAddDevice.Name = "btnAddDevice";
             btnAddDevice.Size = new Size(110, 23);
             btnAddDevice.TabIndex = 2;
@@ -68,7 +69,7 @@
             // 
             // btnEditDevice
             // 
-            btnEditDevice.Location = new Point(147, 355);
+            btnEditDevice.Location = new Point(146, 427);
             btnEditDevice.Name = "btnEditDevice";
             btnEditDevice.Size = new Size(110, 23);
             btnEditDevice.TabIndex = 3;
@@ -76,19 +77,18 @@
             btnEditDevice.UseVisualStyleBackColor = true;
             btnEditDevice.Click += btnEditDevice_Click;
             // 
-            // btnEditConnection
+            // btnAddNotes
             // 
-            btnEditConnection.Location = new Point(282, 355);
-            btnEditConnection.Name = "btnEditConnection";
-            btnEditConnection.Size = new Size(110, 23);
-            btnEditConnection.TabIndex = 4;
-            btnEditConnection.Text = "Edit Connections";
-            btnEditConnection.UseVisualStyleBackColor = true;
-            btnEditConnection.Click += btnEditConnection_Click;
+            btnAddNotes.Location = new Point(281, 427);
+            btnAddNotes.Name = "btnAddNotes";
+            btnAddNotes.Size = new Size(110, 23);
+            btnAddNotes.TabIndex = 4;
+            btnAddNotes.Text = "Add Notes";
+            btnAddNotes.UseVisualStyleBackColor = true;
             // 
             // btnDeleteDevice
             // 
-            btnDeleteDevice.Location = new Point(415, 355);
+            btnDeleteDevice.Location = new Point(414, 427);
             btnDeleteDevice.Name = "btnDeleteDevice";
             btnDeleteDevice.Size = new Size(110, 23);
             btnDeleteDevice.TabIndex = 5;
@@ -98,25 +98,37 @@
             // 
             // txtBox
             // 
-            txtBox.Location = new Point(12, 316);
+            txtBox.Location = new Point(12, 328);
+            txtBox.Multiline = true;
             txtBox.Name = "txtBox";
-            txtBox.Size = new Size(245, 23);
+            txtBox.Size = new Size(512, 82);
             txtBox.TabIndex = 6;
+            // 
+            // lblNotes
+            // 
+            lblNotes.AutoSize = true;
+            lblNotes.Location = new Point(12, 310);
+            lblNotes.Name = "lblNotes";
+            lblNotes.Size = new Size(41, 15);
+            lblNotes.TabIndex = 7;
+            lblNotes.Text = "Notes:";
             // 
             // WMForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(537, 402);
+            ClientSize = new Size(536, 483);
+            Controls.Add(lblNotes);
             Controls.Add(txtBox);
             Controls.Add(btnDeleteDevice);
-            Controls.Add(btnEditConnection);
+            Controls.Add(btnAddNotes);
             Controls.Add(btnEditDevice);
             Controls.Add(btnAddDevice);
             Controls.Add(lst_Description);
             Controls.Add(tree_WiringManagement);
             KeyPreview = true;
             Name = "WMForm";
+            StartPosition = FormStartPosition.CenterScreen;
             Text = "Wiring Management System";
             ResumeLayout(false);
             PerformLayout();
@@ -129,8 +141,9 @@
         private ListBox lst_Description;
         private Button btnAddDevice;
         private Button btnEditDevice;
-        private Button btnEditConnection;
+        private Button btnAddNotes;
         private Button btnDeleteDevice;
         private TextBox txtBox;
+        private Label lblNotes;
     }
 }
