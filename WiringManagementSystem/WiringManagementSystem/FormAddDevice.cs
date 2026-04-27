@@ -1,14 +1,13 @@
-﻿using WiringManagementSystem.Classes;
+﻿using Microsoft.IdentityModel.Tokens;
+using WiringManagementSystem.Classes;
 
 namespace WiringManagementSystem
 {
     public partial class FrmAddDevice : Form
     {
-        public static WMContext WMDB = new WMContext();
-
         // Setup Pod Dropdown
         // Had to move pod declaration here to be able to access the "No Pod" device from anywhere in the form
-        public List<Device> pods = WMDB.Devices.Where(d => d.Type == DeviceType.Pod).ToList();
+        public List<Device> pods = new List<Device>();
 
         public Device CreatedDevice { get; private set; }
 
@@ -20,10 +19,12 @@ namespace WiringManagementSystem
             cmbAddDeviceType.DataSource = Enum.GetValues(typeof(DeviceType));
 
             // Load Racks and Pods from the database into the dropdowns
-            using (WMDB)
+            using (WMContext ctx = new WMContext())
             {
+                pods = ctx.Devices.Where(d => d.Type == DeviceType.Pod).ToList();
+
                 // Setup Rack Dropdown
-                var racks = WMDB.Racks.ToList();
+                var racks = ctx.Racks.ToList();
                 cmbAddRack.DataSource = racks;
                 cmbAddRack.DisplayMember = "RackName";
                 cmbAddRack.ValueMember = "RackID";
@@ -54,7 +55,10 @@ namespace WiringManagementSystem
         // When the user changes the rack selection, only allows pods that are in the selected rack
         private void cmbAddRack_SelectedIndexChanged(object sender, EventArgs e)
         {
-            cmbAddPod.DataSource = pods.Where(d => (d.RackID == cmbAddRack.SelectedValue.ToString() && d.Type == DeviceType.Pod) || string.IsNullOrEmpty(d.RackID)).ToList();
+            string rackId = cmbAddRack.SelectedValue?.ToString() ?? "Rack1";
+            cmbAddPod.DataSource = pods
+                .Where(d => (d.RackID == rackId && d.Type == DeviceType.Pod) || string.IsNullOrEmpty(d.RackID))
+                .ToList();
         }
 
         // When the user changes the device type selection, disable the Pod dropdown if they select "Pod" since a pod can't belong to another pod
@@ -101,10 +105,10 @@ namespace WiringManagementSystem
                 DeviceName = txtAddDeviceName.Text
             };
 
-            using (WMDB)
+            using (WMContext ctx = new WMContext())
             {
-                WMDB.Devices.Add(CreatedDevice);
-                WMDB.SaveChanges();
+                ctx.Devices.Add(CreatedDevice);
+                ctx.SaveChanges();
             }
 
             // Tell the main form we successfully created a device

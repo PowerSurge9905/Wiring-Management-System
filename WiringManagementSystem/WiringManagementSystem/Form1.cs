@@ -10,7 +10,6 @@ namespace WiringManagementSystem
     public partial class WMForm : Form
     {
         // Prepare lists for loading the racks and devices from the database
-        WMContext WMDB = new WMContext();
         List<Rack> racks = new List<Rack>();
         List<Device> devices = new List<Device>();
 
@@ -37,8 +36,14 @@ namespace WiringManagementSystem
         {
             try
             {
-                racks = WMDB.Racks.ToList();
-                devices = WMDB.Devices.ToList();
+                racks.Clear();
+                devices.Clear();
+
+                using (WMContext ctx = new WMContext())
+                {
+                    racks = ctx.Racks.ToList();
+                    devices = ctx.Devices.ToList();
+                }
             }
             catch (SqliteException ex)
             {
@@ -59,7 +64,7 @@ namespace WiringManagementSystem
             foreach (var rack in racks)
             {
                 TreeNode rackNode = new TreeNode(rack.RackName);
-                rackNode.Tag = rack.RackID;
+                rackNode.Tag = new[] { rack.RackID, rack.RackName, rack.Notes };
                 tree_WiringManagement.Nodes.Add(rackNode);
 
                 // Query devices that are in the current rack and not in a pod
@@ -68,7 +73,7 @@ namespace WiringManagementSystem
                 foreach (var device in rackDevices)
                 {
                     TreeNode deviceNode = new TreeNode(device.DeviceName);
-                    deviceNode.Tag = new[] { device.DeviceID, device.Type.ToString(), device.RackID, device.PodID };
+                    deviceNode.Tag = new List<string> { device.DeviceID, device.Type.ToString(), device.RackID, device.PodID, device.Notes };
                     rackNode.Nodes.Add(deviceNode);
 
                     // If the device is a pod, query for devices that are in that pod and add them as child nodes under the pod node
@@ -78,7 +83,7 @@ namespace WiringManagementSystem
                         foreach (var podDevice in podDevices)
                         {
                             TreeNode podDeviceNode = new TreeNode(podDevice.DeviceName);
-                            podDeviceNode.Tag = new[] { podDevice.DeviceID, podDevice.Type.ToString(), podDevice.RackID, podDevice.PodID };
+                            podDeviceNode.Tag = new[] { podDevice.DeviceID, podDevice.Type.ToString(), podDevice.RackID, podDevice.PodID, podDevice.Notes };
                             deviceNode.Nodes.Add(podDeviceNode);
                         }
                     }
@@ -96,8 +101,9 @@ namespace WiringManagementSystem
             lst_Description.Items.Clear();
             if (clickedNode != null)
             {
+                txtNotes.Enabled = true;
                 lst_Description.Items.Add($"Name: {clickedNode.Text}");
-                var tag = clickedNode.Tag as object[];
+                var tag = clickedNode.Tag as string[];
 
                 // Check if the clicked node is a root node or a pod, if so show number of devices contained within
                 if (clickedNode.Parent == null || (tag != null && tag[1].ToString() == DeviceType.Pod.ToString()))
@@ -121,12 +127,18 @@ namespace WiringManagementSystem
                         lst_Description.Items.Add($"Rack: {clickedNode.Parent.Text}");
                     }
 
-                    txtNotes.Text = WMDB.Devices.Find(clickedNode.Tag.ToString())?.Notes;
+                    txtNotes.Text = tag[4]?.ToString();
 
-                } else if (clickedNode.Parent == null)
-                {
-                    txtNotes.Text = WMDB.Racks.Find(clickedNode.Tag.ToString())?.Notes;
                 }
+                else if (clickedNode.Parent == null)
+                {
+                    txtNotes.Text = tag[2]?.ToString();
+                    Console.WriteLine($"Note: {txtNotes.Text}");
+                }
+            }
+            else
+            {
+                txtNotes.Enabled = false;
             }
 
             // If there is no node under the mouse, clear the selection
@@ -153,7 +165,7 @@ namespace WiringManagementSystem
                 }
                 else // They clicked a Child Node (A Device or a Pod)
                 {
-                    var tagArray = selectedNode.Tag as object[];
+                    var tagArray = selectedNode.Tag as string[];
                     if (tagArray != null)
                     {
                         if (tagArray[1].ToString() == DeviceType.Pod.ToString())
@@ -176,71 +188,8 @@ namespace WiringManagementSystem
             // Wait for the user to hit "Add"
             if (addDeviceForm.ShowDialog() == DialogResult.OK)
             {
-                Device newDevice = addDeviceForm.CreatedDevice;
-
-                // Save to the SQLite database immediately
-                try
-                {
-                    using (WMContext ctx = new WMContext())
-                    {
-                        ctx.Devices.Add(newDevice);
-                        ctx.SaveChanges();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error saving to database: " + ex.Message);
-                    return; // Stop running if the database fails
-                }
-
-                // Create the visible node and assign the hidden Tag array
-                TreeNode node = new TreeNode(newDevice.DeviceName);
-                node.Tag = new[] { newDevice.DeviceID, newDevice.Type.ToString(), newDevice.RackID, newDevice.PodID };
-
-                // Search the tree to find exactly where to put the new node
-                TreeNode targetParent = null;
-
-                foreach (TreeNode rackNode in tree_WiringManagement.Nodes)
-                {
-                    if (rackNode.Tag != null && rackNode.Tag.ToString() == newDevice.RackID)
-                    {
-                        targetParent = rackNode; // Target parent becomes the Rack node
-
-                        if (!string.IsNullOrEmpty(newDevice.PodID))
-                        {
-                            foreach (TreeNode podNode in rackNode.Nodes)
-                            {
-                                var tagData = podNode.Tag as object[];
-                                if (tagData != null && tagData.Length > 0 && tagData[0].ToString() == newDevice.PodID)
-                                {
-                                    targetParent = podNode; // Target parent becomes the Pod node instead
-                                    break;
-                                }
-                            }
-                        }
-                        break; // Stop searching racks once we found the right one
-                    }
-                }
-
-                // Insert the node exactly where it belongs
-                try
-                {
-                    if (targetParent != null)
-                    {
-                        // Find the Rack or Pod and insert the new node as a child of that Rack or Pod
-                        targetParent.Nodes.Add(node);
-                        targetParent.Expand();
-                    }
-                    else
-                    {
-                        // Add it to the main tree if a parent wasn't found
-                        tree_WiringManagement.Nodes.Add(node);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("Error adding node to form: " + ex.Message);
-                }
+                QueryLists(); // Refresh the lists to include the new device
+                BuildTreeView(racks, devices); // Rebuild the tree view to include the new device
             }
         }
 
@@ -263,7 +212,7 @@ namespace WiringManagementSystem
             }
 
             // Extract the ID from the selected node's Tag array
-            var tagArray = selectedNode.Tag as object[];
+            var tagArray = selectedNode.Tag as string[];
             if (tagArray == null) return;
 
             string deviceId = tagArray[0]?.ToString(); // tag[0] is always the DeviceID
@@ -321,7 +270,7 @@ namespace WiringManagementSystem
                                     {
                                         foreach (TreeNode podNode in rackNode.Nodes)
                                         {
-                                            var podTagData = podNode.Tag as object[];
+                                            var podTagData = podNode.Tag as string[];
                                             if (podTagData != null && podTagData.Length > 0 && podTagData[0].ToString() == updatedDevice.PodID)
                                             {
                                                 targetParent = podNode; // Target parent becomes the Pod node instead
@@ -360,13 +309,6 @@ namespace WiringManagementSystem
                     }
                 }
             }
-        }
-
-        // Edits the selected node's text to match what's in text box
-        // TODO: Remove
-        private void btnEditNotes_Click(object sender, EventArgs e)
-        {
-            tree_WiringManagement.SelectedNode.Text = txtNotes.Text;
         }
 
         // Delete the selected node and all of its children
@@ -411,7 +353,7 @@ namespace WiringManagementSystem
                             {
                                 foreach (TreeNode deviceNode in selectedNode.Nodes)
                                 {
-                                    var deviceTag = deviceNode.Tag as object[];
+                                    var deviceTag = deviceNode.Tag as string[];
                                     if (deviceTag != null)
                                     {
                                         string deviceId = deviceTag[0]?.ToString();
@@ -425,7 +367,7 @@ namespace WiringManagementSystem
                                         {
                                             foreach (TreeNode podChildNode in deviceNode.Nodes)
                                             {
-                                                var podChildTag = podChildNode.Tag as object[];
+                                                var podChildTag = podChildNode.Tag as string[];
                                                 if (podChildTag != null)
                                                 {
                                                     string podChildDeviceId = podChildTag[0]?.ToString();
@@ -458,7 +400,7 @@ namespace WiringManagementSystem
                             {
                                 foreach (TreeNode childNode in selectedNode.Nodes)
                                 {
-                                    var childTag = childNode.Tag as object[];
+                                    var childTag = childNode.Tag as string[];
                                     if (childTag != null)
                                     {
                                         string childDeviceId = childTag[0]?.ToString();
@@ -471,7 +413,7 @@ namespace WiringManagementSystem
                                 }
                             }
                             // Devices/Pods store an array of data in the Tag
-                            var tagArray = selectedNode.Tag as object[];
+                            var tagArray = selectedNode.Tag as string[];
                             if (tagArray != null)
                             {
                                 string deviceId = tagArray[0]?.ToString(); // tag[0] is the DeviceID
@@ -521,7 +463,7 @@ namespace WiringManagementSystem
                 // Clear out all nodes before querying the Rack and Device lists, then rebuilding the tree view
                 tree_WiringManagement.Nodes.Clear();
                 QueryLists();
-                BuildTreeView(WMDB.Racks.ToList(), WMDB.Devices.ToList());
+                BuildTreeView(racks, devices);
             }
             catch (SqliteException ex)
             {
@@ -534,7 +476,7 @@ namespace WiringManagementSystem
 
         private void tree_WiringManagement_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
-            txtNotes.Enabled = true;
+
         }
 
         private void btnSaveNotes_Click(object sender, EventArgs e)
@@ -544,23 +486,32 @@ namespace WiringManagementSystem
                 using (WMContext ctx = new WMContext())
                 {
                     TreeNode selectedNode = tree_WiringManagement.SelectedNode;
+                    var tagList = selectedNode.Tag as string[];
                     if (selectedNode != null && selectedNode.Parent != null)
                     {
-                        var tagArray = selectedNode.Tag as object[];
-                        if (tagArray != null)
+                        if (tagList != null)
                         {
-                            string deviceId = tagArray[0]?.ToString();
+                            string deviceId = tagList[0]?.ToString();
                             var deviceToUpdate = ctx.Devices.Find(deviceId);
                             if (deviceToUpdate != null)
                             {
-                                deviceToUpdate.Notes = txtNotes.Text;
+                                if (txtNotes.Text.IsNullOrEmpty())
+                                {
+                                    deviceToUpdate.Notes = null; // Set to null if the text box is empty to avoid storing empty strings
+                                    selectedNode.Tag = new[] { deviceToUpdate.DeviceID, deviceToUpdate.Type.ToString(), deviceToUpdate.RackID, deviceToUpdate.PodID, null };
+                                }
+                                else
+                                {
+                                    deviceToUpdate.Notes = txtNotes.Text;
+                                    selectedNode.Tag = new[] { deviceToUpdate.DeviceID, deviceToUpdate.Type.ToString(), deviceToUpdate.RackID, deviceToUpdate.PodID, deviceToUpdate.Notes };
+                                }
                                 ctx.SaveChanges();
                             }
                         }
                     }
                     else if (selectedNode.Parent == null)
                     {
-                        string rackId = selectedNode.Tag?.ToString();
+                        string rackId = tagList[0]?.ToString();
                         var rackToUpdate = ctx.Racks.Find(rackId);
                         if (rackToUpdate != null)
                         {
@@ -575,12 +526,22 @@ namespace WiringManagementSystem
                             ctx.SaveChanges();
                         }
                     }
+
+
                 }
+
+                QueryLists();
+                BuildTreeView(racks, devices);
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Error saving notes: " + ex.Message, "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void tree_WiringManagement_ControlAdded(object sender, ControlEventArgs e)
+        {
+            txtNotes.Text = "";
         }
     }
 }
