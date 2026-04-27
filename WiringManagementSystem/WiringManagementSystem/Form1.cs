@@ -575,13 +575,6 @@ namespace WiringManagementSystem
                             ctx.SaveChanges();
                         }
                     }
-                    using (WMContext refreshCtx = new WMContext())
-                    {
-                        // Refresh the tree view to reflect the updated notes
-                        var refreshedRacks = refreshCtx.Racks.ToList();
-                        var refreshedDevices = refreshCtx.Devices.ToList();
-                        BuildTreeView(refreshedRacks, refreshedDevices);
-                    }
                 }
             }
             catch (Exception ex)
