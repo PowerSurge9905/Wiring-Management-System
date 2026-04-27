@@ -70,7 +70,7 @@ namespace WiringManagementSystem
                 foreach (var device in rackDevices)
                 {
                     TreeNode deviceNode = new TreeNode(device.DeviceName);
-                    deviceNode.Tag = new List<string> { device.DeviceID, device.Type.ToString(), device.RackID, device.PodID, device.Notes };
+                    deviceNode.Tag = new[] { device.DeviceID, device.Type.ToString(), device.RackID, device.PodID, device.Notes };
                     rackNode.Nodes.Add(deviceNode);
 
                     // If the device is a pod, query for devices that are in that pod and add them as child nodes under the pod node
