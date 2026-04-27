@@ -61,7 +61,7 @@ namespace WiringManagementSystem.Classes
                 new Device { DeviceID = PodBID, DeviceName = "Pod B", Type = DeviceType.Pod, RackID = Rack1ID }, // Pod B
                 new Device { DeviceID = PodCID, DeviceName = "Pod C", Type = DeviceType.Pod, RackID = Rack1ID }, // Pod C
                 new Device { DeviceID = PodDID, DeviceName = "Pod D", Type = DeviceType.Pod, RackID = Rack1ID }, // Pod D
-                new Device { DeviceID = "RT00", DeviceName = "Cisco 1900 Series Router - Rack 1", Type = DeviceType.Router, RackID = Rack1ID},
+                new Device { DeviceID = "RT00", DeviceName = "Cisco 1900 Series Router - Rack 1", Type = DeviceType.Router, RackID = Rack1ID },
                 new Device { DeviceID = "SW00", DeviceName = "Catalyst 2900 Plus Series Switch - Rack 1", Type = DeviceType.Switch, RackID = Rack1ID },
                 new Device { DeviceID = "FRWA", DeviceName = "ASA 5505 Series Firewall - Bloc A", Type = DeviceType.Firewall, RackID = Rack1ID }, // Pod A firewall
                 new Device { DeviceID = "FRWB", DeviceName = "ASA 5505 Series Firewall - Bloc B", Type = DeviceType.Firewall, RackID = Rack1ID }, // Pod B firewall
@@ -99,7 +99,7 @@ namespace WiringManagementSystem.Classes
                 new Device { DeviceID = "SW10", DeviceName = "Catalyst 2900 Plus Series Switch", Type = DeviceType.Switch, RackID = Rack1ID, PodID = PodDID }, // Pod D, switch 1
                 new Device { DeviceID = "SW11", DeviceName = "Catalyst 2900 Plus Series Switch", Type = DeviceType.Switch, RackID = Rack1ID, PodID = PodDID }, // Pod D, switch 2
                 new Device { DeviceID = "SW12", DeviceName = "Catalyst 2900 Plus Series Switch", Type = DeviceType.Switch, RackID = Rack1ID, PodID = PodDID }, // Pod D, switch 3
-                // End of Rack 1 devices
+                                                                                                                                                               // End of Rack 1 devices
 
                 // Rack 2 devices
                 new Device { DeviceID = PodEID, DeviceName = "Pod E", Type = DeviceType.Pod, RackID = Rack2ID }, // Pod E
@@ -144,7 +144,7 @@ namespace WiringManagementSystem.Classes
                 new Device { DeviceID = "SW23", DeviceName = "Catalyst 2900 Plus Series Switch", Type = DeviceType.Switch, RackID = Rack2ID, PodID = PodHID }, // switch 1
                 new Device { DeviceID = "SW24", DeviceName = "Catalyst 2900 Plus Series Switch", Type = DeviceType.Switch, RackID = Rack2ID, PodID = PodHID }, // switch 2
                 new Device { DeviceID = "SW25", DeviceName = "Catalyst 2900 Plus Series Switch", Type = DeviceType.Switch, RackID = Rack2ID, PodID = PodHID }, // switch 3
-                // End of Rack 2 devices
+                                                                                                                                                               // End of Rack 2 devices
 
                 // Rack 3 devices
                 new Device { DeviceID = "SRVMGMT", DeviceName = "Management Server", Type = DeviceType.Server, RackID = Rack3ID }, // management server
@@ -154,7 +154,7 @@ namespace WiringManagementSystem.Classes
                 new Device { DeviceID = "SWCLST", DeviceName = "Cluster Switch", Type = DeviceType.Switch, RackID = Rack3ID }, // cluster switch
                 new Device { DeviceID = "SWCTRL", DeviceName = "NL Control Switch", Type = DeviceType.Switch, RackID = Rack3ID }, // NL control switch
                 new Device { DeviceID = "SRVBCK", DeviceName = "Backup Server", Type = DeviceType.Server, RackID = Rack3ID }, // backup server
-                // End of Rack 3 devices
+                                                                                                                              // End of Rack 3 devices
 
                 // Rack 4 devices
                 new Device { DeviceID = PodIID, DeviceName = "Pod I", Type = DeviceType.Pod, RackID = Rack4ID }, // Pod I
@@ -175,7 +175,7 @@ namespace WiringManagementSystem.Classes
                 new Device { DeviceID = "SW27", DeviceName = "Catalyst 2900 Plus Series Switch", Type = DeviceType.Switch, RackID = Rack4ID, PodID = PodIID }, // Pod I, switch 1
                 new Device { DeviceID = "SW28", DeviceName = "Catalyst 2900 Plus Series Switch", Type = DeviceType.Switch, RackID = Rack4ID, PodID = PodIID }, // Pod I, switch 2
                 new Device { DeviceID = "SW29", DeviceName = "Catalyst 2900 Plus Series Switch", Type = DeviceType.Switch, RackID = Rack4ID, PodID = PodIID }, // Pod I, switch 3
-                
+
                 // Pod J devices
                 new Device { DeviceID = "RT30", DeviceName = "Cisco 1900 Series Router", Type = DeviceType.Router, RackID = Rack4ID, PodID = PodJID }, // Pod J, router 1
                 new Device { DeviceID = "RT31", DeviceName = "Cisco 1900 Series Router", Type = DeviceType.Router, RackID = Rack4ID, PodID = PodJID }, // Pod J, router 2
@@ -183,7 +183,7 @@ namespace WiringManagementSystem.Classes
                 new Device { DeviceID = "SW30", DeviceName = "Catalyst 2900 Plus Series Switch", Type = DeviceType.Switch, RackID = Rack4ID, PodID = PodJID }, // Pod J, switch 1
                 new Device { DeviceID = "SW31", DeviceName = "Catalyst 2900 Plus Series Switch", Type = DeviceType.Switch, RackID = Rack4ID, PodID = PodJID }, // Pod J, switch 2
                 new Device { DeviceID = "SW32", DeviceName = "Catalyst 2900 Plus Series Switch", Type = DeviceType.Switch, RackID = Rack4ID, PodID = PodJID }, // Pod J, switch 3
-                // Pod K devices
+                                                                                                                                                               // Pod K devices
                 new Device { DeviceID = "RT33", DeviceName = "Cisco 1900 Series Router", Type = DeviceType.Router, RackID = Rack4ID, PodID = PodKID }, // Pod K, router 1
                 new Device { DeviceID = "RT34", DeviceName = "Cisco 1900 Series Router", Type = DeviceType.Router, RackID = Rack4ID, PodID = PodKID }, // Pod K, router 2
                 new Device { DeviceID = "RT35", DeviceName = "Cisco 1900 Series Router", Type = DeviceType.Router, RackID = Rack4ID, PodID = PodKID }, // Pod K, router 3
@@ -198,7 +198,7 @@ namespace WiringManagementSystem.Classes
                 new Device { DeviceID = "SW36", DeviceName = "Catalyst 2900 Plus Series Switch", Type = DeviceType.Switch, RackID = Rack4ID, PodID = PodLID }, // Pod L, switch 1
                 new Device { DeviceID = "SW37", DeviceName = "Catalyst 2900 Plus Series Switch", Type = DeviceType.Switch, RackID = Rack4ID, PodID = PodLID }, // Pod L, switch 2
                 new Device { DeviceID = "SW38", DeviceName = "Catalyst 2900 Plus Series Switch", Type = DeviceType.Switch, RackID = Rack4ID, PodID = PodLID }, // Pod L, switch 3
-                // End of Rack 4 devices
+                                                                                                                                                               // End of Rack 4 devices
 
                 // Rack 5 devices
                 new Device { DeviceID = PodMID, DeviceName = "Pod M", Type = DeviceType.Pod, RackID = Rack5ID }, // Pod M

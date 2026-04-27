@@ -112,10 +112,5 @@ namespace WiringManagementSystem
             this.DialogResult = DialogResult.Cancel;
             this.Close();
         }
-
-        private void FrmEditDevice_Load(object sender, EventArgs e)
-        {
-
-        }
     }
 }

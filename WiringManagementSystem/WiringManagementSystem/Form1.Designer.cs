@@ -48,7 +48,6 @@
             tree_WiringManagement.Name = "tree_WiringManagement";
             tree_WiringManagement.Size = new Size(513, 198);
             tree_WiringManagement.TabIndex = 0;
-            tree_WiringManagement.NodeMouseClick += tree_WiringManagement_NodeMouseClick;
             tree_WiringManagement.ControlAdded += tree_WiringManagement_ControlAdded;
             tree_WiringManagement.MouseDown += treeView_MouseDown;
             // 

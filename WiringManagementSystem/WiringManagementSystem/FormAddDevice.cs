@@ -1,5 +1,4 @@
-﻿using Microsoft.IdentityModel.Tokens;
-using WiringManagementSystem.Classes;
+﻿using WiringManagementSystem.Classes;
 
 namespace WiringManagementSystem
 {
@@ -94,7 +93,7 @@ namespace WiringManagementSystem
                 MessageBox.Show("Please select a device type.", "Missing Information", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            
+
             // Build new device based on form inputs
             CreatedDevice = new Device
             {
@@ -120,11 +119,6 @@ namespace WiringManagementSystem
         {
             this.DialogResult = DialogResult.Cancel;
             this.Close();
-        }
-
-        private void txtAddRack_TextChanged(object sender, EventArgs e)
-        {
-
         }
     }
 }

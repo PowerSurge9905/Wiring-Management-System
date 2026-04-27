@@ -8,7 +8,7 @@ namespace WiringManagementSystem.Classes
         public WMContext CreateDbContext(string[] args)
         {
             var optionsBuilder = new DbContextOptionsBuilder<WMContext>();
-            optionsBuilder.UseSqlite("Data Source=WMDB.sqlite");
+            optionsBuilder.UseSqlite(Globals.connectionString);
 
             return new WMContext(optionsBuilder.Options);
         }

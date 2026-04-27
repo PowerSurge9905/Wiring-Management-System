@@ -1,9 +1,6 @@
-using WiringManagementSystem.Classes;
 using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using Microsoft.IdentityModel.Tokens;
-
+using WiringManagementSystem.Classes;
 
 namespace WiringManagementSystem
 {
@@ -472,11 +469,6 @@ namespace WiringManagementSystem
             catch (Exception)
             {
             }
-        }
-
-        private void tree_WiringManagement_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
-        {
-
         }
 
         private void btnSaveNotes_Click(object sender, EventArgs e)
