@@ -120,6 +120,7 @@
             cmbAddRack.Name = "cmbAddRack";
             cmbAddRack.Size = new Size(153, 23);
             cmbAddRack.TabIndex = 8;
+            cmbAddRack.SelectedIndexChanged += cmbAddRack_SelectedIndexChanged;
             // 
             // cmbAddPod
             // 

@@ -9,6 +9,12 @@ namespace WiringManagementSystem
 {
     public partial class FrmAddDevice : Form
     {
+        public static WMContext WMDB = new WMContext();
+
+        // Setup Pod Dropdown
+        // Had to move pod declaration here to be able to access the "No Pod" device from anywhere in the form
+        public List<Device> pods = WMDB.Devices.Where(d => d.Type == DeviceType.Pod).ToList();
+
         public Device CreatedDevice { get; private set; }
 
         public FrmAddDevice(string existingRackId, string existingPodId)
@@ -27,13 +33,10 @@ namespace WiringManagementSystem
                 cmbAddRack.DisplayMember = "RackName";
                 cmbAddRack.ValueMember = "RackID";
 
-                // Setup Pod Dropdown
-                var pods = db.Devices.Where(d => d.Type == DeviceType.Pod).ToList();
-
                 // Add a "Blank" option for devices that don't belong in a pod
                 pods.Insert(0, new Device { DeviceID = "", DeviceName = "--- No Pod ---", Type = DeviceType.Pod, RackID = "" });
 
-                cmbAddPod.DataSource = pods;
+                cmbAddPod.DataSource = pods.Where(p => p.RackID == cmbAddRack.SelectedValue.ToString() || string.IsNullOrEmpty(p.RackID)).ToList();
                 cmbAddPod.DisplayMember = "DeviceName";
                 cmbAddPod.ValueMember = "DeviceID";
             }
@@ -54,6 +57,25 @@ namespace WiringManagementSystem
             }
         }
 
+        private void cmbAddRack_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            cmbAddPod.DataSource = pods.Where(d => (d.RackID == cmbAddRack.SelectedValue.ToString() && d.Type == DeviceType.Pod) || string.IsNullOrEmpty(d.RackID)).ToList();
+        }
+
+        private void cmdAddDeviceType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // If the user selects "Pod" as the device type, disable the Pod dropdown since a pod can't belong to another pod
+            if ((DeviceType)cmbAddDeviceType.SelectedItem == DeviceType.Pod)
+            {
+                cmbAddPod.SelectedValue = ""; // Reset to "No Pod" option
+                cmbAddPod.Enabled = false;
+            }
+            else
+            {
+                cmbAddPod.Enabled = true;
+            }
+        }
+
         private void btnAdd_Click(object sender, EventArgs e)
         {
             // Prevent the user from saving a blank device name
@@ -67,7 +89,7 @@ namespace WiringManagementSystem
             string selectedPodId = cmbAddPod.SelectedValue?.ToString();
 
             // Just incase the combobox gets set to an incorrect value
-            if (comboBoxAddDeviceType.SelectedItem == null)
+            if (cmbAddDeviceType.SelectedItem == null)
             {
                 MessageBox.Show("Please select a device type.", "Missing Information", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
@@ -82,14 +104,11 @@ namespace WiringManagementSystem
                 Type = (DeviceType)cmbAddDeviceType.SelectedItem,
                 DeviceName = txtAddDeviceName.Text
             };
-            
-            // Check if rack here
 
-            using (var connection = new SqliteConnection(Globals.connectionString))
+            using (WMDB)
             {
-                connection.Open();
-                var command = connection.CreateCommand();
-                    command.CommandText = "INSERT INTO";
+                WMDB.Devices.Add(CreatedDevice);
+                WMDB.SaveChanges();
             }
 
             // Tell the main form we successfully created a device

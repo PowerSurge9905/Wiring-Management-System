@@ -43,7 +43,7 @@
             // 
             tree_WiringManagement.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             tree_WiringManagement.Font = new Font("Courier New", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            tree_WiringManagement.Location = new Point(12, 12);
+            tree_WiringManagement.Location = new Point(12, 41);
             tree_WiringManagement.Name = "tree_WiringManagement";
             tree_WiringManagement.Size = new Size(513, 198);
             tree_WiringManagement.TabIndex = 0;
@@ -54,7 +54,7 @@
             lst_Description.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             lst_Description.Font = new Font("Courier New", 9.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
             lst_Description.FormattingEnabled = true;
-            lst_Description.Location = new Point(12, 216);
+            lst_Description.Location = new Point(12, 245);
             lst_Description.Name = "lst_Description";
             lst_Description.Size = new Size(513, 84);
             lst_Description.TabIndex = 1;
@@ -62,7 +62,7 @@
             // 
             // btnAddDevice
             // 
-            btnAddDevice.Location = new Point(12, 429);
+            btnAddDevice.Location = new Point(12, 12);
             btnAddDevice.Name = "btnAddDevice";
             btnAddDevice.Size = new Size(110, 23);
             btnAddDevice.TabIndex = 2;
@@ -72,7 +72,7 @@
             // 
             // btnEditDevice
             // 
-            btnEditDevice.Location = new Point(146, 429);
+            btnEditDevice.Location = new Point(146, 12);
             btnEditDevice.Name = "btnEditDevice";
             btnEditDevice.Size = new Size(110, 23);
             btnEditDevice.TabIndex = 3;
@@ -82,7 +82,7 @@
             // 
             // btnDeleteDevice
             // 
-            btnDeleteDevice.Location = new Point(415, 429);
+            btnDeleteDevice.Location = new Point(415, 12);
             btnDeleteDevice.Name = "btnDeleteDevice";
             btnDeleteDevice.Size = new Size(110, 23);
             btnDeleteDevice.TabIndex = 5;
@@ -93,7 +93,7 @@
             // lblNotes
             // 
             lblNotes.AutoSize = true;
-            lblNotes.Location = new Point(12, 303);
+            lblNotes.Location = new Point(12, 332);
             lblNotes.Name = "lblNotes";
             lblNotes.Size = new Size(41, 15);
             lblNotes.TabIndex = 7;
@@ -101,7 +101,7 @@
             // 
             // btnEditNotes
             // 
-            btnEditNotes.Location = new Point(280, 429);
+            btnEditNotes.Location = new Point(280, 12);
             btnEditNotes.Name = "btnEditNotes";
             btnEditNotes.Size = new Size(110, 23);
             btnEditNotes.TabIndex = 8;
@@ -113,7 +113,7 @@
             lstNotes.FormattingEnabled = true;
             lstNotes.HorizontalScrollbar = true;
             lstNotes.ItemHeight = 15;
-            lstNotes.Location = new Point(12, 321);
+            lstNotes.Location = new Point(12, 350);
             lstNotes.Name = "lstNotes";
             lstNotes.Size = new Size(513, 94);
             lstNotes.TabIndex = 9;
