@@ -47,7 +47,7 @@ namespace WiringManagementSystem.Classes
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Rack>().HasData(
-                new Rack { RackID = Rack1ID, RackName = "Rack 1", Notes = new List<string> { "Note1", "Note2" } },
+                new Rack { RackID = Rack1ID, RackName = "Rack 1" },
                 new Rack { RackID = Rack2ID, RackName = "Rack 2" },
                 new Rack { RackID = Rack3ID, RackName = "Rack 3" },
                 new Rack { RackID = Rack4ID, RackName = "Rack 4" },

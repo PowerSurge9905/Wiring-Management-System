@@ -35,8 +35,9 @@
             btnEditDevice = new Button();
             btnDeleteDevice = new Button();
             lblNotes = new Label();
-            btnEditNotes = new Button();
-            lstNotes = new ListBox();
+            btnReloadTree = new Button();
+            txtNotes = new TextBox();
+            btnSaveNotes = new Button();
             SuspendLayout();
             // 
             // tree_WiringManagement
@@ -47,6 +48,7 @@
             tree_WiringManagement.Name = "tree_WiringManagement";
             tree_WiringManagement.Size = new Size(513, 198);
             tree_WiringManagement.TabIndex = 0;
+            tree_WiringManagement.NodeMouseClick += tree_WiringManagement_NodeMouseClick;
             tree_WiringManagement.MouseDown += treeView_MouseDown;
             // 
             // lst_Description
@@ -64,7 +66,7 @@
             // 
             btnAddDevice.Location = new Point(12, 12);
             btnAddDevice.Name = "btnAddDevice";
-            btnAddDevice.Size = new Size(110, 23);
+            btnAddDevice.Size = new Size(111, 23);
             btnAddDevice.TabIndex = 2;
             btnAddDevice.Text = "Add Device";
             btnAddDevice.UseVisualStyleBackColor = true;
@@ -74,7 +76,7 @@
             // 
             btnEditDevice.Location = new Point(146, 12);
             btnEditDevice.Name = "btnEditDevice";
-            btnEditDevice.Size = new Size(110, 23);
+            btnEditDevice.Size = new Size(111, 23);
             btnEditDevice.TabIndex = 3;
             btnEditDevice.Text = "Edit Device";
             btnEditDevice.UseVisualStyleBackColor = true;
@@ -82,9 +84,9 @@
             // 
             // btnDeleteDevice
             // 
-            btnDeleteDevice.Location = new Point(415, 12);
+            btnDeleteDevice.Location = new Point(280, 12);
             btnDeleteDevice.Name = "btnDeleteDevice";
-            btnDeleteDevice.Size = new Size(110, 23);
+            btnDeleteDevice.Size = new Size(111, 23);
             btnDeleteDevice.TabIndex = 5;
             btnDeleteDevice.Text = "Delete Device";
             btnDeleteDevice.UseVisualStyleBackColor = true;
@@ -93,38 +95,50 @@
             // lblNotes
             // 
             lblNotes.AutoSize = true;
-            lblNotes.Location = new Point(12, 332);
+            lblNotes.Location = new Point(12, 339);
             lblNotes.Name = "lblNotes";
             lblNotes.Size = new Size(41, 15);
             lblNotes.TabIndex = 7;
             lblNotes.Text = "Notes:";
             // 
-            // btnEditNotes
+            // btnReloadTree
             // 
-            btnEditNotes.Location = new Point(280, 12);
-            btnEditNotes.Name = "btnEditNotes";
-            btnEditNotes.Size = new Size(110, 23);
-            btnEditNotes.TabIndex = 8;
-            btnEditNotes.Text = "Edit Notes";
-            btnEditNotes.UseVisualStyleBackColor = true;
+            btnReloadTree.Location = new Point(414, 12);
+            btnReloadTree.Name = "btnReloadTree";
+            btnReloadTree.Size = new Size(111, 23);
+            btnReloadTree.TabIndex = 10;
+            btnReloadTree.Text = "Refresh";
+            btnReloadTree.UseVisualStyleBackColor = true;
+            btnReloadTree.Click += btnReloadTree_Click;
             // 
-            // lstNotes
+            // txtNotes
             // 
-            lstNotes.FormattingEnabled = true;
-            lstNotes.HorizontalScrollbar = true;
-            lstNotes.ItemHeight = 15;
-            lstNotes.Location = new Point(12, 350);
-            lstNotes.Name = "lstNotes";
-            lstNotes.Size = new Size(513, 94);
-            lstNotes.TabIndex = 9;
+            txtNotes.Enabled = false;
+            txtNotes.Location = new Point(12, 364);
+            txtNotes.Multiline = true;
+            txtNotes.Name = "txtNotes";
+            txtNotes.ScrollBars = ScrollBars.Vertical;
+            txtNotes.Size = new Size(513, 106);
+            txtNotes.TabIndex = 11;
+            // 
+            // btnSaveNotes
+            // 
+            btnSaveNotes.Location = new Point(414, 335);
+            btnSaveNotes.Name = "btnSaveNotes";
+            btnSaveNotes.Size = new Size(111, 23);
+            btnSaveNotes.TabIndex = 12;
+            btnSaveNotes.Text = "Save Notes";
+            btnSaveNotes.UseVisualStyleBackColor = true;
+            btnSaveNotes.Click += btnSaveNotes_Click;
             // 
             // WMForm
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(537, 468);
-            Controls.Add(lstNotes);
-            Controls.Add(btnEditNotes);
+            ClientSize = new Size(537, 513);
+            Controls.Add(btnSaveNotes);
+            Controls.Add(txtNotes);
+            Controls.Add(btnReloadTree);
             Controls.Add(lblNotes);
             Controls.Add(btnDeleteDevice);
             Controls.Add(btnEditDevice);
@@ -150,7 +164,8 @@
         private Button btnEditDevice;
         private Button btnDeleteDevice;
         private Label lblNotes;
-        private Button btnEditNotes;
-        private ListBox lstNotes;
+        private Button btnReloadTree;
+        private TextBox txtNotes;
+        private Button btnSaveNotes;
     }
 }

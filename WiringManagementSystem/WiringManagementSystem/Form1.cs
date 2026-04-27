@@ -20,9 +20,29 @@ namespace WiringManagementSystem
             InitializeComponent();
             try
             {
+                QueryLists();
+                BuildTreeView(racks, devices);
+            }
+            catch (SqliteException ex)
+            {
+                txtNotes.Text = "Error loading from database: " + ex.Message;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Exception!");
+            }
+        }
+
+        private void QueryLists()
+        {
+            try
+            {
                 racks = WMDB.Racks.ToList();
                 devices = WMDB.Devices.ToList();
-                BuildTreeView(racks, devices);
+            }
+            catch (SqliteException ex)
+            {
+                txtNotes.Text = "Error loading from database: " + ex.Message;
             }
             catch (Exception ex)
             {
@@ -100,6 +120,12 @@ namespace WiringManagementSystem
                     {
                         lst_Description.Items.Add($"Rack: {clickedNode.Parent.Text}");
                     }
+
+                    txtNotes.Text = WMDB.Devices.Find(clickedNode.Tag.ToString())?.Notes;
+
+                } else if (clickedNode.Parent == null)
+                {
+                    txtNotes.Text = WMDB.Racks.Find(clickedNode.Tag.ToString())?.Notes;
                 }
             }
 
@@ -117,7 +143,7 @@ namespace WiringManagementSystem
             string targetPodId = "";
 
             TreeNode selectedNode = tree_WiringManagement.SelectedNode;
-    
+
             // Check what the user clicked to extract the IDs for Auto-fill
             if (selectedNode != null)
             {
@@ -135,7 +161,7 @@ namespace WiringManagementSystem
                             targetPodId = tagArray[0]?.ToString();  // The Pod's DeviceID
                             targetRackId = tagArray[2]?.ToString(); // The Rack it belongs to
                         }
-                        else 
+                        else
                         {
                             targetRackId = tagArray[2]?.ToString(); // A regular device's Rack
                             targetPodId = tagArray[3]?.ToString();  // A regular device's Pod
@@ -155,10 +181,10 @@ namespace WiringManagementSystem
                 // Save to the SQLite database immediately
                 try
                 {
-                    using (WMContext wmdb = new WMContext())
+                    using (WMContext ctx = new WMContext())
                     {
-                        wmdb.Devices.Add(newDevice);
-                        wmdb.SaveChanges();
+                        ctx.Devices.Add(newDevice);
+                        ctx.SaveChanges();
                     }
                 }
                 catch (Exception ex)
@@ -188,7 +214,7 @@ namespace WiringManagementSystem
                                 if (tagData != null && tagData.Length > 0 && tagData[0].ToString() == newDevice.PodID)
                                 {
                                     targetParent = podNode; // Target parent becomes the Pod node instead
-                                    break; 
+                                    break;
                                 }
                             }
                         }
@@ -242,10 +268,10 @@ namespace WiringManagementSystem
 
             string deviceId = tagArray[0]?.ToString(); // tag[0] is always the DeviceID
 
-            using (WMContext db = new WMContext())
+            using (WMContext ctx = new WMContext())
             {
                 // Fetch the exact device from the database
-                Device deviceToEdit = db.Devices.Find(deviceId);
+                Device deviceToEdit = ctx.Devices.Find(deviceId);
 
                 if (deviceToEdit == null)
                 {
@@ -264,8 +290,8 @@ namespace WiringManagementSystem
                     try
                     {
                         // Save the changes to the database first
-                        db.Entry(deviceToEdit).CurrentValues.SetValues(updatedDevice);
-                        db.SaveChanges();
+                        ctx.Entry(deviceToEdit).CurrentValues.SetValues(updatedDevice);
+                        ctx.SaveChanges();
 
                         // Figure out if the device was moved to a new Rack or Pod
                         string oldRackId = tagArray[2]?.ToString();
@@ -337,27 +363,28 @@ namespace WiringManagementSystem
         }
 
         // Edits the selected node's text to match what's in text box
-        // TODO: Change this to open a new window which allows the user to enter notes for connections
+        // TODO: Remove
         private void btnEditNotes_Click(object sender, EventArgs e)
         {
-            tree_WiringManagement.SelectedNode.Text = lstNotes.Text;
+            tree_WiringManagement.SelectedNode.Text = txtNotes.Text;
         }
 
         // Delete the selected node and all of its children
         private void btnDeleteDevice_Click(object sender, EventArgs e)
         {
-            
+            List<Device> devicesToDelete = new List<Device>();
+
             var selectedNode = tree_WiringManagement.SelectedNode;
-            if(selectedNode == null)
+            if (selectedNode == null)
             {
                 MessageBox.Show("Please select a node to delete.", "Selection Missing", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            
+
             // Asks for comfirmation
             DialogResult result = DialogResult.None;
 
-            if(selectedNode.GetNodeCount(true) > 0)
+            if (selectedNode.GetNodeCount(true) > 0)
             {
                 result = confirmDeletion(result, true);
             }
@@ -371,39 +398,99 @@ namespace WiringManagementSystem
             {
                 try
                 {
-                    using (var db = new WMContext())
+                    using (WMContext ctx = new WMContext())
                     {
                         // Is it a Root Node (A Rack)?
                         if (selectedNode.Parent == null)
                         {
                             // Racks store just their string ID in the Tag
                             string rackId = selectedNode.Tag?.ToString();
-                            var rackToDelete = db.Racks.Find(rackId);
+                            var rackToDelete = ctx.Racks.Find(rackId);
+
+                            if (selectedNode.GetNodeCount(true) > 0)
+                            {
+                                foreach (TreeNode deviceNode in selectedNode.Nodes)
+                                {
+                                    var deviceTag = deviceNode.Tag as object[];
+                                    if (deviceTag != null)
+                                    {
+                                        string deviceId = deviceTag[0]?.ToString();
+                                        var deviceToDelete = ctx.Devices.Find(deviceId);
+                                        if (deviceToDelete != null)
+                                        {
+                                            devicesToDelete.Add(deviceToDelete);
+                                        }
+                                        // If it's a Pod, we also need to delete its child devices
+                                        if (deviceTag[1].ToString() == DeviceType.Pod.ToString())
+                                        {
+                                            foreach (TreeNode podChildNode in deviceNode.Nodes)
+                                            {
+                                                var podChildTag = podChildNode.Tag as object[];
+                                                if (podChildTag != null)
+                                                {
+                                                    string podChildDeviceId = podChildTag[0]?.ToString();
+                                                    var podChildDeviceToDelete = ctx.Devices.Find(podChildDeviceId);
+                                                    if (podChildDeviceToDelete != null)
+                                                    {
+                                                        devicesToDelete.Add(podChildDeviceToDelete);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
 
                             if (rackToDelete != null)
                             {
-                                db.Racks.Remove(rackToDelete);
+                                foreach (var device in devicesToDelete)
+                                {
+                                    ctx.Devices.Remove(device);
+                                }
+
+                                ctx.Racks.Remove(rackToDelete);
                             }
                         }
                         // Otherwise, it is a Child Node (A Device or Pod)
                         else
                         {
+                            if (selectedNode.GetNodeCount(true) > 0)
+                            {
+                                foreach (TreeNode childNode in selectedNode.Nodes)
+                                {
+                                    var childTag = childNode.Tag as object[];
+                                    if (childTag != null)
+                                    {
+                                        string childDeviceId = childTag[0]?.ToString();
+                                        var childDeviceToDelete = ctx.Devices.Find(childDeviceId);
+                                        if (childDeviceToDelete != null)
+                                        {
+                                            devicesToDelete.Add(childDeviceToDelete);
+                                        }
+                                    }
+                                }
+                            }
                             // Devices/Pods store an array of data in the Tag
                             var tagArray = selectedNode.Tag as object[];
                             if (tagArray != null)
                             {
                                 string deviceId = tagArray[0]?.ToString(); // tag[0] is the DeviceID
-                                var deviceToDelete = db.Devices.Find(deviceId);
+                                var deviceToDelete = ctx.Devices.Find(deviceId);
 
                                 if (deviceToDelete != null)
                                 {
-                                    db.Devices.Remove(deviceToDelete);
+                                    foreach (var device in devicesToDelete)
+                                    {
+                                        ctx.Devices.Remove(device);
+                                    }
+
+                                    ctx.Devices.Remove(deviceToDelete);
                                 }
                             }
                         }
 
                         // Delete it from the database file
-                        db.SaveChanges();
+                        ctx.SaveChanges();
                     }
 
                     // Visually remove the node from the treeview UI
@@ -417,7 +504,7 @@ namespace WiringManagementSystem
                     MessageBox.Show("Error deleting from database: " + ex.Message, "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
-            
+
         }
 
         private DialogResult confirmDeletion(DialogResult result, bool showChildNodes)
@@ -425,6 +512,82 @@ namespace WiringManagementSystem
             return MessageBox.Show(
                 $"Are you sure you want to delete {tree_WiringManagement.SelectedNode.Text}?" + (showChildNodes ? $"\nThis will also delete {tree_WiringManagement.SelectedNode.GetNodeCount(true)} child devices!" : ""),
                 "Confirm Deletion", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+        }
+
+        private void btnReloadTree_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Clear out all nodes before querying the Rack and Device lists, then rebuilding the tree view
+                tree_WiringManagement.Nodes.Clear();
+                QueryLists();
+                BuildTreeView(WMDB.Racks.ToList(), WMDB.Devices.ToList());
+            }
+            catch (SqliteException ex)
+            {
+                txtNotes.Text = "Error loading from database: " + ex.Message;
+            }
+            catch (Exception)
+            {
+            }
+        }
+
+        private void tree_WiringManagement_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            txtNotes.Enabled = true;
+        }
+
+        private void btnSaveNotes_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                using (WMContext ctx = new WMContext())
+                {
+                    TreeNode selectedNode = tree_WiringManagement.SelectedNode;
+                    if (selectedNode != null && selectedNode.Parent != null)
+                    {
+                        var tagArray = selectedNode.Tag as object[];
+                        if (tagArray != null)
+                        {
+                            string deviceId = tagArray[0]?.ToString();
+                            var deviceToUpdate = ctx.Devices.Find(deviceId);
+                            if (deviceToUpdate != null)
+                            {
+                                deviceToUpdate.Notes = txtNotes.Text;
+                                ctx.SaveChanges();
+                            }
+                        }
+                    }
+                    else if (selectedNode.Parent == null)
+                    {
+                        string rackId = selectedNode.Tag?.ToString();
+                        var rackToUpdate = ctx.Racks.Find(rackId);
+                        if (rackToUpdate != null)
+                        {
+                            if (txtNotes.Text.IsNullOrEmpty())
+                            {
+                                rackToUpdate.Notes = null; // Set to null if the text box is empty to avoid storing empty strings
+                            }
+                            else
+                            {
+                                rackToUpdate.Notes = txtNotes.Text;
+                            }
+                            ctx.SaveChanges();
+                        }
+                    }
+                    using (WMContext refreshCtx = new WMContext())
+                    {
+                        // Refresh the tree view to reflect the updated notes
+                        var refreshedRacks = refreshCtx.Racks.ToList();
+                        var refreshedDevices = refreshCtx.Devices.ToList();
+                        BuildTreeView(refreshedRacks, refreshedDevices);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error saving notes: " + ex.Message, "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }

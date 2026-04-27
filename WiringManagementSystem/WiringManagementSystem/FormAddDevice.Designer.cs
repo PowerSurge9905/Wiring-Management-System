@@ -111,6 +111,7 @@
             cmbAddDeviceType.Name = "cmbAddDeviceType";
             cmbAddDeviceType.Size = new Size(153, 23);
             cmbAddDeviceType.TabIndex = 2;
+            cmbAddDeviceType.SelectedIndexChanged += cmdAddDeviceType_SelectedIndexChanged;
             // 
             // cmbAddRack
             // 

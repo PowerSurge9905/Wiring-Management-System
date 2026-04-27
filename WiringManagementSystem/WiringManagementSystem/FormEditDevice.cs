@@ -7,11 +7,17 @@ namespace WiringManagementSystem
     {
         public Device EditedDevice { get; private set; }
 
+        public List<Device> pods;
+
         private string originalDeviceId;
 
         public FrmEditDevice(Device deviceToEdit)
         {
             InitializeComponent();
+
+            WMContext WMDB = new WMContext();
+
+            pods = WMDB.Devices.Where(d => d.Type == DeviceType.Pod).ToList();
 
             // Save the ID
             originalDeviceId = deviceToEdit.DeviceID;
@@ -20,16 +26,14 @@ namespace WiringManagementSystem
             cmbEditDeviceType.DataSource = Enum.GetValues(typeof(DeviceType));
 
             // Load Racks and Pods from the database
-            using (WMContext db = new WMContext())
+            using (WMDB)
             {
-                var racks = db.Racks.ToList();
+                var racks = WMDB.Racks.ToList();
                 cmbEditRack.DataSource = racks;
                 cmbEditRack.DisplayMember = "RackName";
                 cmbEditRack.ValueMember = "RackID";
 
-                var pods = db.Devices.Where(d => d.Type == DeviceType.Pod).ToList();
                 pods.Insert(0, new Device { DeviceID = "", DeviceName = "--- No Pod ---", Type = DeviceType.Pod, RackID = "" });
-                cmbEditPod.DataSource = pods;
                 cmbEditPod.DisplayMember = "DeviceName";
                 cmbEditPod.ValueMember = "DeviceID";
             }
@@ -38,7 +42,32 @@ namespace WiringManagementSystem
             txtEditDeviceName.Text = deviceToEdit.DeviceName;
             cmbEditDeviceType.SelectedItem = deviceToEdit.Type;
             cmbEditRack.SelectedValue = deviceToEdit.RackID;
+            cmbEditPod.DataSource = pods.Where(p => p.RackID == cmbEditRack.SelectedValue.ToString() || string.IsNullOrEmpty(p.RackID)).ToList();
             cmbEditPod.SelectedValue = string.IsNullOrEmpty(deviceToEdit.PodID) ? "" : deviceToEdit.PodID;
+
+            if (deviceToEdit.Type == DeviceType.Pod)
+            {
+                cmbEditPod.Enabled = false;
+            }
+        }
+
+        private void cmbEditRack_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            cmbEditPod.DataSource = pods.Where(d => (d.RackID == cmbEditRack.SelectedValue.ToString() && d.Type == DeviceType.Pod) || string.IsNullOrEmpty(d.RackID)).ToList();
+        }
+
+        private void cmdEditDeviceType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            // If the user selects "Pod" as the device type, disable the Pod dropdown since a pod can't belong to another pod
+            if ((DeviceType)cmbEditDeviceType.SelectedItem == DeviceType.Pod)
+            {
+                cmbEditPod.SelectedValue = ""; // Reset to "No Pod" option
+                cmbEditPod.Enabled = false;
+            }
+            else
+            {
+                cmbEditPod.Enabled = true;
+            }
         }
 
         // Saves changes and closes the form with DialogResult.OK. The calling code will handle the actual database update.
@@ -61,6 +90,18 @@ namespace WiringManagementSystem
                 Type = (DeviceType)cmbEditDeviceType.SelectedItem,
                 DeviceName = txtEditDeviceName.Text
             };
+            using (var WMDB = new WMContext())
+            {
+                var row = WMDB.Devices.FirstOrDefault(d => d.DeviceID == EditedDevice.DeviceID);
+                if (row != null)
+                {
+                    row.DeviceName = EditedDevice.DeviceName;
+                    row.Type = EditedDevice.Type;
+                    row.RackID = EditedDevice.RackID;
+                    row.PodID = EditedDevice.PodID;
+                    WMDB.SaveChanges();
+                }
+            }
 
             this.DialogResult = DialogResult.OK;
             this.Close();

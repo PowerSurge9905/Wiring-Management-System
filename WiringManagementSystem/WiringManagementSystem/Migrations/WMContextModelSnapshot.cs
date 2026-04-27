@@ -1161,7 +1161,6 @@ namespace WiringManagementSystem.Migrations
                         new
                         {
                             RackID = "RK01",
-                            Notes = "[\"Note1\",\"Note2\"]",
                             RackName = "Rack 1"
                         },
                         new

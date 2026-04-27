@@ -111,6 +111,7 @@
             cmbEditDeviceType.Name = "cmbEditDeviceType";
             cmbEditDeviceType.Size = new Size(153, 23);
             cmbEditDeviceType.TabIndex = 2;
+            cmbEditDeviceType.SelectedIndexChanged += cmdEditDeviceType_SelectedIndexChanged;
             // 
             // cmbEditRack
             // 
@@ -120,6 +121,7 @@
             cmbEditRack.Name = "cmbEditRack";
             cmbEditRack.Size = new Size(153, 23);
             cmbEditRack.TabIndex = 10;
+            cmbEditRack.SelectedIndexChanged += cmbEditRack_SelectedIndexChanged;
             // 
             // cmbEditPod
             // 

@@ -10,7 +10,7 @@ using WiringManagementSystem.Classes;
 namespace WiringManagementSystem.Migrations
 {
     [DbContext(typeof(WMContext))]
-    [Migration("20260426232631_Initial")]
+    [Migration("20260427064500_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -1164,7 +1164,6 @@ namespace WiringManagementSystem.Migrations
                         new
                         {
                             RackID = "RK01",
-                            Notes = "[\"Note1\",\"Note2\"]",
                             RackName = "Rack 1"
                         },
                         new

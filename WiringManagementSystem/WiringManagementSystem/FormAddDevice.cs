@@ -1,9 +1,4 @@
-﻿using Microsoft.Data.Sqlite;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Windows.Forms;
-using WiringManagementSystem.Classes;
+﻿using WiringManagementSystem.Classes;
 
 namespace WiringManagementSystem
 {
@@ -25,17 +20,16 @@ namespace WiringManagementSystem
             cmbAddDeviceType.DataSource = Enum.GetValues(typeof(DeviceType));
 
             // Load Racks and Pods from the database into the dropdowns
-            using (WMContext db = new WMContext())
+            using (WMDB)
             {
                 // Setup Rack Dropdown
-                var racks = db.Racks.ToList();
+                var racks = WMDB.Racks.ToList();
                 cmbAddRack.DataSource = racks;
                 cmbAddRack.DisplayMember = "RackName";
                 cmbAddRack.ValueMember = "RackID";
 
                 // Add a "Blank" option for devices that don't belong in a pod
                 pods.Insert(0, new Device { DeviceID = "", DeviceName = "--- No Pod ---", Type = DeviceType.Pod, RackID = "" });
-
                 cmbAddPod.DataSource = pods.Where(p => p.RackID == cmbAddRack.SelectedValue.ToString() || string.IsNullOrEmpty(p.RackID)).ToList();
                 cmbAddPod.DisplayMember = "DeviceName";
                 cmbAddPod.ValueMember = "DeviceID";
@@ -57,11 +51,13 @@ namespace WiringManagementSystem
             }
         }
 
+        // When the user changes the rack selection, only allows pods that are in the selected rack
         private void cmbAddRack_SelectedIndexChanged(object sender, EventArgs e)
         {
             cmbAddPod.DataSource = pods.Where(d => (d.RackID == cmbAddRack.SelectedValue.ToString() && d.Type == DeviceType.Pod) || string.IsNullOrEmpty(d.RackID)).ToList();
         }
 
+        // When the user changes the device type selection, disable the Pod dropdown if they select "Pod" since a pod can't belong to another pod
         private void cmdAddDeviceType_SelectedIndexChanged(object sender, EventArgs e)
         {
             // If the user selects "Pod" as the device type, disable the Pod dropdown since a pod can't belong to another pod
