@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(WMForm));
             tree_WiringManagement = new TreeView();
             sqlDataAdapter1 = new Microsoft.Data.SqlClient.SqlDataAdapter();
             lst_Description = new ListBox();
@@ -146,6 +147,7 @@
             Controls.Add(lst_Description);
             Controls.Add(tree_WiringManagement);
             FormBorderStyle = FormBorderStyle.FixedSingle;
+            Icon = (Icon)resources.GetObject("$this.Icon");
             KeyPreview = true;
             MaximizeBox = false;
             Name = "WMForm";

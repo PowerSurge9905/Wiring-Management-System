@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FrmAddDevice));
             lblAddDeviceName = new Label();
             txtAddDeviceName = new TextBox();
             btnAdd = new Button();
@@ -149,6 +150,7 @@
             Controls.Add(btnAdd);
             Controls.Add(txtAddDeviceName);
             Controls.Add(lblAddDeviceName);
+            Icon = (Icon)resources.GetObject("$this.Icon");
             Name = "FrmAddDevice";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Add Device";
