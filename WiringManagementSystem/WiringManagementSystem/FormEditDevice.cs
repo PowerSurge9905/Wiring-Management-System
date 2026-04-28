@@ -11,6 +11,8 @@ namespace WiringManagementSystem
 
         private string originalDeviceId;
 
+        private readonly string originalDeviceNotes;
+
         public FrmEditDevice(Device deviceToEdit)
         {
             InitializeComponent();
@@ -21,6 +23,7 @@ namespace WiringManagementSystem
 
             // Save the ID
             originalDeviceId = deviceToEdit.DeviceID;
+            originalDeviceNotes = deviceToEdit.Notes;
 
             // Load Device Types enum into the dropdown
             cmbEditDeviceType.DataSource = Enum.GetValues(typeof(DeviceType));
@@ -88,7 +91,8 @@ namespace WiringManagementSystem
                 RackID = cmbEditRack.SelectedValue?.ToString(),
                 PodID = string.IsNullOrEmpty(selectedPodId) ? null : selectedPodId,
                 Type = (DeviceType)cmbEditDeviceType.SelectedItem,
-                DeviceName = txtEditDeviceName.Text
+                DeviceName = txtEditDeviceName.Text,
+                Notes = originalDeviceNotes
             };
             using (var WMDB = new WMContext())
             {
@@ -99,6 +103,7 @@ namespace WiringManagementSystem
                     row.Type = EditedDevice.Type;
                     row.RackID = EditedDevice.RackID;
                     row.PodID = EditedDevice.PodID;
+                    row.Notes = EditedDevice.Notes;
                     WMDB.SaveChanges();
                 }
             }

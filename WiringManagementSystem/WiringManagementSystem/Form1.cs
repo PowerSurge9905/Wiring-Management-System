@@ -230,80 +230,8 @@ namespace WiringManagementSystem
 
                 if (editForm.ShowDialog() == DialogResult.OK)
                 {
-                    // Grab the updated data from the form
-                    Device updatedDevice = editForm.EditedDevice;
-
-                    try
-                    {
-                        // Save the changes to the database first
-                        ctx.Entry(deviceToEdit).CurrentValues.SetValues(updatedDevice);
-                        ctx.SaveChanges();
-
-                        // Figure out if the device was moved to a new Rack or Pod
-                        string oldRackId = tagArray[2]?.ToString();
-                        string oldPodId = tagArray[3]?.ToString();
-                        bool locationChanged = (oldRackId != updatedDevice.RackID) || (oldPodId != updatedDevice.PodID);
-
-                        // Instantly update the text on the screen and the hidden Tag data
-                        selectedNode.Text = updatedDevice.DeviceName;
-                        selectedNode.Tag = new[] { updatedDevice.DeviceID, updatedDevice.Type.ToString(), updatedDevice.RackID, updatedDevice.PodID };
-
-                        // If it moved, we need to physically move the node on the treeview UI
-                        if (locationChanged)
-                        {
-                            // Remove it out of its current folder
-                            selectedNode.Remove();
-
-                            // Search the tree to find exactly where to put the updated node based on its new RackID and PodID
-                            TreeNode targetParent = null;
-
-                            foreach (TreeNode rackNode in tree_WiringManagement.Nodes)
-                            {
-                                if (rackNode.Tag != null && rackNode.Tag.ToString() == updatedDevice.RackID)
-                                {
-                                    targetParent = rackNode; // Target parent becomes the Rack node
-
-                                    if (!string.IsNullOrEmpty(updatedDevice.PodID))
-                                    {
-                                        foreach (TreeNode podNode in rackNode.Nodes)
-                                        {
-                                            var podTagData = podNode.Tag as string[];
-                                            if (podTagData != null && podTagData.Length > 0 && podTagData[0].ToString() == updatedDevice.PodID)
-                                            {
-                                                targetParent = podNode; // Target parent becomes the Pod node instead
-                                                break;
-                                            }
-                                        }
-                                    }
-                                    break; // Stop searching racks once we found the right one
-                                }
-                            }
-
-                            // Drop the node exactly where it belongs
-                            if (targetParent != null)
-                            {
-                                targetParent.Nodes.Add(selectedNode);
-                                targetParent.Expand();
-                            }
-                            else
-                            {
-                                // Add it to the main tree if parent wasn't found
-                                tree_WiringManagement.Nodes.Add(selectedNode);
-                            }
-                        }
-
-                        // Keep the edited node highlighted and visible on the screen
-                        tree_WiringManagement.SelectedNode = selectedNode;
-                        selectedNode.EnsureVisible();
-                        tree_WiringManagement.Focus();
-
-                        // Clear the description box since the data just changed
-                        lst_Description.Items.Clear();
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show("Error saving changes: " + ex.Message, "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
+                    QueryLists(); // Refresh the lists to include the new device
+                    BuildTreeView(racks, devices); // Rebuild the tree view to include the new device
                 }
             }
         }
@@ -317,6 +245,11 @@ namespace WiringManagementSystem
             if (selectedNode == null)
             {
                 MessageBox.Show("Please select a node to delete.", "Selection Missing", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            else if (selectedNode.Parent == null)
+            {
+                MessageBox.Show("Please select a device to delete, not a rack.", "Invalid Selection", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
@@ -339,92 +272,37 @@ namespace WiringManagementSystem
                 {
                     using (WMContext ctx = new WMContext())
                     {
-                        // Is it a Root Node (A Rack)?
-                        if (selectedNode.Parent == null)
+                        if (selectedNode.GetNodeCount(true) > 0)
                         {
-                            // Racks store just their string ID in the Tag
-                            string rackId = selectedNode.Tag?.ToString();
-                            var rackToDelete = ctx.Racks.Find(rackId);
-
-                            if (selectedNode.GetNodeCount(true) > 0)
+                            foreach (TreeNode childNode in selectedNode.Nodes)
                             {
-                                foreach (TreeNode deviceNode in selectedNode.Nodes)
+                                var childTag = childNode.Tag as string[];
+                                if (childTag != null)
                                 {
-                                    var deviceTag = deviceNode.Tag as string[];
-                                    if (deviceTag != null)
+                                    string childDeviceId = childTag[0]?.ToString();
+                                    var childDeviceToDelete = ctx.Devices.Find(childDeviceId);
+                                    if (childDeviceToDelete != null)
                                     {
-                                        string deviceId = deviceTag[0]?.ToString();
-                                        var deviceToDelete = ctx.Devices.Find(deviceId);
-                                        if (deviceToDelete != null)
-                                        {
-                                            devicesToDelete.Add(deviceToDelete);
-                                        }
-                                        // If it's a Pod, we also need to delete its child devices
-                                        if (deviceTag[1].ToString() == DeviceType.Pod.ToString())
-                                        {
-                                            foreach (TreeNode podChildNode in deviceNode.Nodes)
-                                            {
-                                                var podChildTag = podChildNode.Tag as string[];
-                                                if (podChildTag != null)
-                                                {
-                                                    string podChildDeviceId = podChildTag[0]?.ToString();
-                                                    var podChildDeviceToDelete = ctx.Devices.Find(podChildDeviceId);
-                                                    if (podChildDeviceToDelete != null)
-                                                    {
-                                                        devicesToDelete.Add(podChildDeviceToDelete);
-                                                    }
-                                                }
-                                            }
-                                        }
+                                        devicesToDelete.Add(childDeviceToDelete);
                                     }
                                 }
                             }
+                        }
+                        // Devices/Pods store an array of data in the Tag
+                        var tagArray = selectedNode.Tag as string[];
+                        if (tagArray != null)
+                        {
+                            string deviceId = tagArray[0]?.ToString(); // tag[0] is the DeviceID
+                            var deviceToDelete = ctx.Devices.Find(deviceId);
 
-                            if (rackToDelete != null)
+                            if (deviceToDelete != null)
                             {
                                 foreach (var device in devicesToDelete)
                                 {
                                     ctx.Devices.Remove(device);
                                 }
 
-                                ctx.Racks.Remove(rackToDelete);
-                            }
-                        }
-                        // Otherwise, it is a Child Node (A Device or Pod)
-                        else
-                        {
-                            if (selectedNode.GetNodeCount(true) > 0)
-                            {
-                                foreach (TreeNode childNode in selectedNode.Nodes)
-                                {
-                                    var childTag = childNode.Tag as string[];
-                                    if (childTag != null)
-                                    {
-                                        string childDeviceId = childTag[0]?.ToString();
-                                        var childDeviceToDelete = ctx.Devices.Find(childDeviceId);
-                                        if (childDeviceToDelete != null)
-                                        {
-                                            devicesToDelete.Add(childDeviceToDelete);
-                                        }
-                                    }
-                                }
-                            }
-                            // Devices/Pods store an array of data in the Tag
-                            var tagArray = selectedNode.Tag as string[];
-                            if (tagArray != null)
-                            {
-                                string deviceId = tagArray[0]?.ToString(); // tag[0] is the DeviceID
-                                var deviceToDelete = ctx.Devices.Find(deviceId);
-
-                                if (deviceToDelete != null)
-                                {
-                                    foreach (var device in devicesToDelete)
-                                    {
-                                        ctx.Devices.Remove(device);
-                                    }
-
-                                    ctx.Devices.Remove(deviceToDelete);
-                                }
+                                ctx.Devices.Remove(deviceToDelete);
                             }
                         }
 
@@ -449,7 +327,7 @@ namespace WiringManagementSystem
         private DialogResult confirmDeletion(DialogResult result, bool showChildNodes)
         {
             return MessageBox.Show(
-                $"Are you sure you want to delete {tree_WiringManagement.SelectedNode.Text}?" + (showChildNodes ? $"\nThis will also delete {tree_WiringManagement.SelectedNode.GetNodeCount(true)} child devices!" : ""),
+                $"Are you sure you want to delete {tree_WiringManagement.SelectedNode.Text}?" + (showChildNodes ? $"\nThis will also delete {tree_WiringManagement.SelectedNode.GetNodeCount(true)} child {(tree_WiringManagement.SelectedNode.GetNodeCount(true) > 1 ? "devices" : "device")}!" : ""),
                 "Confirm Deletion", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
         }
 
@@ -478,48 +356,54 @@ namespace WiringManagementSystem
                 using (WMContext ctx = new WMContext())
                 {
                     TreeNode selectedNode = tree_WiringManagement.SelectedNode;
-                    var tagList = selectedNode.Tag as string[];
-                    if (selectedNode != null && selectedNode.Parent != null)
+                    if (selectedNode != null)
                     {
-                        if (tagList != null)
+                        var tagList = selectedNode.Tag as string[];
+                        if (selectedNode.Parent != null)
                         {
-                            string deviceId = tagList[0]?.ToString();
-                            var deviceToUpdate = ctx.Devices.Find(deviceId);
-                            if (deviceToUpdate != null)
+                            if (tagList != null)
+                            {
+                                string deviceId = tagList[0]?.ToString();
+                                var deviceToUpdate = ctx.Devices.Find(deviceId);
+                                if (deviceToUpdate != null)
+                                {
+                                    if (txtNotes.Text.IsNullOrEmpty())
+                                    {
+                                        deviceToUpdate.Notes = null; // Set to null if the text box is empty to avoid storing empty strings
+                                        selectedNode.Tag = new[] { deviceToUpdate.DeviceID, deviceToUpdate.Type.ToString(), deviceToUpdate.RackID, deviceToUpdate.PodID, null };
+                                    }
+                                    else
+                                    {
+                                        deviceToUpdate.Notes = txtNotes.Text;
+                                        selectedNode.Tag = new[] { deviceToUpdate.DeviceID, deviceToUpdate.Type.ToString(), deviceToUpdate.RackID, deviceToUpdate.PodID, deviceToUpdate.Notes };
+                                    }
+                                    ctx.SaveChanges();
+                                }
+                            }
+                        }
+                        else if (selectedNode.Parent == null)
+                        {
+                            string rackId = tagList[0]?.ToString();
+                            var rackToUpdate = ctx.Racks.Find(rackId);
+                            if (rackToUpdate != null)
                             {
                                 if (txtNotes.Text.IsNullOrEmpty())
                                 {
-                                    deviceToUpdate.Notes = null; // Set to null if the text box is empty to avoid storing empty strings
-                                    selectedNode.Tag = new[] { deviceToUpdate.DeviceID, deviceToUpdate.Type.ToString(), deviceToUpdate.RackID, deviceToUpdate.PodID, null };
+                                    rackToUpdate.Notes = null; // Set to null if the text box is empty to avoid storing empty strings
                                 }
                                 else
                                 {
-                                    deviceToUpdate.Notes = txtNotes.Text;
-                                    selectedNode.Tag = new[] { deviceToUpdate.DeviceID, deviceToUpdate.Type.ToString(), deviceToUpdate.RackID, deviceToUpdate.PodID, deviceToUpdate.Notes };
+                                    rackToUpdate.Notes = txtNotes.Text;
                                 }
                                 ctx.SaveChanges();
                             }
                         }
+                        
                     }
-                    else if (selectedNode.Parent == null)
+                    else
                     {
-                        string rackId = tagList[0]?.ToString();
-                        var rackToUpdate = ctx.Racks.Find(rackId);
-                        if (rackToUpdate != null)
-                        {
-                            if (txtNotes.Text.IsNullOrEmpty())
-                            {
-                                rackToUpdate.Notes = null; // Set to null if the text box is empty to avoid storing empty strings
-                            }
-                            else
-                            {
-                                rackToUpdate.Notes = txtNotes.Text;
-                            }
-                            ctx.SaveChanges();
-                        }
+                        MessageBox.Show("Please select a node to save notes for.", "Selection Missing", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     }
-
-
                 }
 
                 QueryLists();
