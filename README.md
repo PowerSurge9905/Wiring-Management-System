@@ -2,7 +2,7 @@
 An app to help manage data center wiring.
 
 ## To Run:
-1. Go to the Releases page on the right, and download WiringManagementSystem.zip
+1. Go to the Releases page, and download WiringManagementSystem.zip
 2. Extract the .zip file to a location of your choosing
 3. Run the WiringManagementSystem application file
 -  Note: The application might be named WiringManagementSystem.exe on some systems
